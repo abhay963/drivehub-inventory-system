@@ -1,36 +1,36 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema(
+const otpSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
-      trim: true,
     },
 
     email: {
       type: String,
       required: true,
-      unique: true,
       lowercase: true,
-      trim: true,
     },
 
     phone: {
       type: String,
       required: true,
-      trim: true,
     },
+
     password: {
       type: String,
       required: true,
-      minlength: 6,
     },
 
-    role: {
+    otp: {
       type: String,
-      enum: ["user", "admin"],
-      default: "user",
+      required: true,
+    },
+
+    expiresAt: {
+      type: Date,
+      required: true,
     },
   },
   {
@@ -38,4 +38,10 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("User", userSchema);
+// Automatically delete OTP documents after expiry
+otpSchema.index(
+  { expiresAt: 1 },
+  { expireAfterSeconds: 0 }
+);
+
+export default mongoose.model("Otp", otpSchema);
