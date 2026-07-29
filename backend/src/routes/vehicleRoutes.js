@@ -3,11 +3,11 @@ import express from "express";
 import protect from "../middleware/authMiddleware.js";
 import admin from "../middleware/adminMiddleware.js";
 
-import { createVehicle,  getAllVehicles, getVehicleById, updateVehicle,  deleteVehicle } from "../controllers/vehicleController.js";
+import { createVehicle,  getAllVehicles, getVehicleById, updateVehicle,searchVehicles, deleteVehicle } from "../controllers/vehicleController.js";
 
 const router = express.Router();
 
-
+router.get("/search", searchVehicles);
 router.get("/", getAllVehicles);
 router.post("/", createVehicle);
 

@@ -170,3 +170,35 @@ const createResponse = await request(app).post("/api/vehicles").send({
 
   expect(response.statusCode).toBe(200);
 });
+
+
+
+test("GET /api/vehicles/search should filter vehicles", async () => {
+  await request(app).post("/api/vehicles").send({
+    brand: "Toyota",
+    model: "Fortuner",
+    category: "SUV",
+    year: 2023,
+    price: 4200000,
+    quantity: 5,
+  });
+
+  await request(app).post("/api/vehicles").send({
+    brand: "Honda",
+    model: "City",
+    category: "Sedan",
+    year: 2022,
+    price: 1500000,
+    quantity: 3,
+  });
+
+  const response = await request(app)
+    .get("/api/vehicles/search")
+    .query({
+      brand: "Toyota",
+    });
+
+  expect(response.statusCode).toBe(200);
+  expect(response.body.length).toBe(1);
+  expect(response.body[0].brand).toBe("Toyota");
+});

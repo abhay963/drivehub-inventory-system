@@ -110,3 +110,22 @@ export const deleteVehicle = async (req, res) => {
   }
 };
 
+export const searchVehicles = async (req, res) => {
+  try {
+    const { brand, model, year } = req.query;
+
+    const filter = {};
+
+    if (brand) filter.brand = brand;
+    if (model) filter.model = model;
+    if (year) filter.year = Number(year);
+
+    const vehicles = await Vehicle.find(filter);
+
+    res.status(200).json(vehicles);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
