@@ -8,7 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Inventory from "./pages/Inventory";
 import AddVehicle from "./pages/AddVehicle";
 import EditVehicle from "./pages/EditVehicle";
-
+import PurchaseHistory from "../src/components/purchase/PurchaseHistory";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 function App() {
@@ -47,6 +47,14 @@ function App() {
             </ProtectedRoute>
           }
         />
+<Route
+  path="/purchases"
+  element={
+    <ProtectedRoute allowedRoles={["user"]}>
+      <PurchaseHistory />
+    </ProtectedRoute>
+  }
+/>
 
         <Route
           path="/edit-vehicle/:id"

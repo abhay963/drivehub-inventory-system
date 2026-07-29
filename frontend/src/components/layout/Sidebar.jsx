@@ -3,27 +3,27 @@ import {
   LayoutDashboard,
   Package,
   PlusCircle,
+  ShoppingBag,
 } from "lucide-react";
 
 const allLinks = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/inventory", label: "Inventory", icon: Package },
   { to: "/add-vehicle", label: "Add Vehicle", icon: PlusCircle, adminOnly: true },
+  { to: "/purchases", label: "Purchase History", icon: ShoppingBag, userOnly: true },
 ];
 
 const Sidebar = () => {
   // Role check based on localStorage user object
-  const user = JSON.parse(localStorage.getItem("user"));
- 
-
-
-
-const isAdmin = user?.role === "admin";
-
-
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const isAdmin = user?.role === "admin";
 
   // Filter links based on user role
-  const links = allLinks.filter((link) => !link.adminOnly || isAdmin);
+  const links = allLinks.filter((link) => {
+    if (link.adminOnly && !isAdmin) return false;
+    if (link.userOnly && isAdmin) return false; // Hide purchase history for admins if needed, or remove this condition if admins can see it too
+    return true;
+  });
 
   return (
     <aside className="hidden md:flex w-56 shrink-0 flex-col border-r border-zinc-800/80 bg-zinc-950 min-h-[calc(100vh-4rem)] py-6 px-3">

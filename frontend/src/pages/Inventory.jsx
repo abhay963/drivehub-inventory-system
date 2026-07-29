@@ -15,6 +15,7 @@ import {
   X,
   ImageOff,
   Minus,
+  CheckCircle2,
 } from "lucide-react";
 import Layout from "../components/layout/Layout";
 import {
@@ -56,12 +57,31 @@ const Inventory = () => {
   const [restockError, setRestockError] = useState("");
   const [stockMode, setStockMode] = useState("increase"); // "increase" | "decrease"
 
+  // Purchase dialog state (user only)
+  const [purchaseTarget, setPurchaseTarget] = useState(null);
+  const [purchaseQuantity, setPurchaseQuantity] = useState("1");
+  const [purchaseError, setPurchaseError] = useState("");
+
+  // Toast
+  const [toast, setToast] = useState(null);
+
   const user = JSON.parse(localStorage.getItem("user"));
   const isAdmin = user?.role === "admin";
 
   useEffect(() => {
     fetchVehicles();
   }, []);
+
+  // Auto-dismiss toast
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 3200);
+    return () => clearTimeout(t);
+  }, [toast]);
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+  };
 
   const fetchVehicles = async () => {
     try {
@@ -119,22 +139,74 @@ const Inventory = () => {
     }
   };
 
-  const handlePurchase = async (id) => {
+  /* -------------------- Purchase dialog helpers -------------------- */
+
+  const openPurchaseDialog = (vehicle) => {
+    setPurchaseTarget(vehicle);
+    setPurchaseQuantity("1");
+    setPurchaseError("");
+  };
+
+  const closePurchaseDialog = () => {
+    if (actionId) return;
+    setPurchaseTarget(null);
+    setPurchaseQuantity("1");
+    setPurchaseError("");
+  };
+
+  const pQtyNum =
+    purchaseQuantity === "" ? null : Number(purchaseQuantity);
+
+  const isValidPurchaseQty =
+    pQtyNum !== null &&
+    Number.isInteger(pQtyNum) &&
+    pQtyNum > 0 &&
+    purchaseTarget &&
+    pQtyNum <= Number(purchaseTarget.quantity || 0);
+
+  const totalPrice =
+    purchaseTarget && isValidPurchaseQty
+      ? Number(purchaseTarget.price || 0) * pQtyNum
+      : purchaseTarget
+        ? Number(purchaseTarget.price || 0)
+        : 0;
+
+  const handlePurchaseSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!isValidPurchaseQty) {
+      if (pQtyNum !== null && pQtyNum > Number(purchaseTarget?.quantity || 0)) {
+        setPurchaseError("Quantity exceeds available stock.");
+      } else {
+        setPurchaseError("Enter a valid positive whole number.");
+      }
+      return;
+    }
+
     try {
-      setActionId(id);
-      const data = await purchaseVehicle(id);
+      setActionId(purchaseTarget._id);
+      setPurchaseError("");
+      const data = await purchaseVehicle(purchaseTarget._id, pQtyNum);
       setVehicles((prev) =>
-        prev.map((v) => (v._id === id ? data.vehicle : v))
+        prev.map((v) => (v._id === purchaseTarget._id ? data.vehicle : v))
       );
       setSelectedVehicle((prev) =>
-        prev?._id === id ? data.vehicle : prev
+        prev?._id === purchaseTarget._id ? data.vehicle : prev
+      );
+      setPurchaseTarget(null);
+      setPurchaseQuantity("1");
+      showToast(
+        `Successfully purchased ${pQtyNum} × ${purchaseTarget.brand} ${purchaseTarget.model}`,
+        "success"
       );
     } catch (err) {
-      alert(err.response?.data?.message || "Purchase failed");
+      setPurchaseError(err.response?.data?.message || "Purchase failed");
     } finally {
       setActionId(null);
     }
   };
+
+  /* -------------------- Restock helpers (unchanged) -------------------- */
 
   const openRestockDialog = (vehicle) => {
     setRestockTarget(vehicle);
@@ -394,7 +466,7 @@ const Inventory = () => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handlePurchase(vehicle._id);
+                            openPurchaseDialog(vehicle);
                           }}
                           disabled={vehicle.quantity === 0 || busy}
                           className={`flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl py-2 text-[12px] font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
@@ -545,7 +617,7 @@ const Inventory = () => {
                       {!isAdmin && (
                         <button
                           type="button"
-                          onClick={() => handlePurchase(selectedVehicle._id)}
+                          onClick={() => openPurchaseDialog(selectedVehicle)}
                           disabled={
                             selectedVehicle.quantity === 0 ||
                             actionId === selectedVehicle._id
@@ -578,6 +650,144 @@ const Inventory = () => {
                   </div>
                 </div>
               </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Purchase Quantity Modal (user only) */}
+        <AnimatePresence>
+          {purchaseTarget && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[60] flex items-center justify-center bg-black/75 px-4 py-6"
+              onClick={closePurchaseDialog}
+            >
+              <motion.form
+                initial={{ opacity: 0, scale: 0.96, y: 12 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96, y: 12 }}
+                transition={{ duration: 0.2 }}
+                onSubmit={handlePurchaseSubmit}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full max-w-md overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl"
+              >
+                {/* Header */}
+                <div className="flex items-start justify-between gap-4 border-b border-zinc-800 p-5">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-emerald-500/25 bg-emerald-500/10 text-emerald-400">
+                      <ShoppingCart className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-bold text-white">
+                        Purchase Vehicle
+                      </h2>
+                      <p className="mt-1 text-sm text-zinc-500">
+                        {purchaseTarget.brand} {purchaseTarget.model}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={closePurchaseDialog}
+                    disabled={actionId === purchaseTarget._id}
+                    className="rounded-lg border border-zinc-800 bg-zinc-900 p-2 text-zinc-400 hover:text-white disabled:opacity-50"
+                    title="Close"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="space-y-4 p-5">
+                  {/* Stock & Unit Price */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
+                      <p className="text-[11px] uppercase tracking-wider text-zinc-500">
+                        Available Stock
+                      </p>
+                      <p className="mt-1 text-xl font-bold text-white">
+                        {purchaseTarget.quantity}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
+                      <p className="text-[11px] uppercase tracking-wider text-zinc-500">
+                        Unit Price
+                      </p>
+                      <p className="mt-1 text-xl font-bold text-white tabular-nums">
+                        {formatPrice(purchaseTarget.price)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Quantity input */}
+                  <div>
+                    <label
+                      htmlFor="purchase-quantity"
+                      className="mb-1.5 block text-[12px] font-semibold uppercase tracking-wider text-zinc-500"
+                    >
+                      Quantity
+                    </label>
+                    <input
+                      id="purchase-quantity"
+                      type="number"
+                      min="1"
+                      max={purchaseTarget.quantity}
+                      step="1"
+                      value={purchaseQuantity}
+                      onChange={(e) => {
+                        setPurchaseQuantity(e.target.value);
+                        setPurchaseError("");
+                      }}
+                      autoFocus
+                      className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-[14px] text-white outline-none transition-all placeholder:text-zinc-600 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/15"
+                      placeholder="e.g. 1"
+                    />
+                  </div>
+
+                  {/* Live Total */}
+                  <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 p-4">
+                    <p className="text-[11px] uppercase tracking-wider text-emerald-400/80">
+                      Total Amount
+                    </p>
+                    <p className="mt-1 text-2xl font-bold text-white tabular-nums">
+                      {formatPrice(totalPrice)}
+                    </p>
+                  </div>
+
+                  {purchaseError && (
+                    <p className="text-xs text-rose-400 font-medium">
+                      {purchaseError}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-end gap-2 border-t border-zinc-800 bg-zinc-900/50 p-4">
+                  <button
+                    type="button"
+                    onClick={closePurchaseDialog}
+                    disabled={actionId === purchaseTarget._id}
+                    className="rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={
+                      !isValidPurchaseQty || actionId === purchaseTarget._id
+                    }
+                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {actionId === purchaseTarget._id ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <ShoppingCart className="w-4 h-4" />
+                    )}
+                    Confirm Purchase
+                  </button>
+                </div>
+              </motion.form>
             </motion.div>
           )}
         </AnimatePresence>
@@ -731,7 +941,9 @@ const Inventory = () => {
                   </div>
 
                   {restockError && (
-                    <p className="text-xs text-rose-400 font-medium">{restockError}</p>
+                    <p className="text-xs text-rose-400 font-medium">
+                      {restockError}
+                    </p>
                   )}
                 </div>
 
@@ -746,7 +958,11 @@ const Inventory = () => {
                   </button>
                   <button
                     type="submit"
-                    disabled={!isValidQty || wouldBeNegative || actionId === restockTarget._id}
+                    disabled={
+                      !isValidQty ||
+                      wouldBeNegative ||
+                      actionId === restockTarget._id
+                    }
                     className="inline-flex items-center gap-2 rounded-xl bg-violet-600 hover:bg-violet-500 px-4 py-2.5 text-sm font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {actionId === restockTarget._id ? (
@@ -758,6 +974,34 @@ const Inventory = () => {
                   </button>
                 </div>
               </motion.form>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Toast notification */}
+        <AnimatePresence>
+          {toast && (
+            <motion.div
+              initial={{ opacity: 0, y: 40, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.96 }}
+              transition={{ duration: 0.25 }}
+              className="fixed bottom-6 left-1/2 z-[80] -translate-x-1/2"
+            >
+              <div
+                className={`flex items-center gap-3 rounded-xl border px-5 py-3.5 shadow-2xl backdrop-blur-md ${
+                  toast.type === "success"
+                    ? "border-emerald-500/30 bg-emerald-500/15 text-emerald-300"
+                    : "border-rose-500/30 bg-rose-500/15 text-rose-300"
+                }`}
+              >
+                {toast.type === "success" ? (
+                  <CheckCircle2 className="w-5 h-5 shrink-0" />
+                ) : (
+                  <AlertCircle className="w-5 h-5 shrink-0" />
+                )}
+                <span className="text-sm font-medium">{toast.message}</span>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

@@ -10,15 +10,13 @@ import {
   ChevronDown,
   Settings,
   Mail,
-  ShieldAlert,
-  KeyRound,
   BadgeCheck,
   Camera,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 /* -------------------------------------------------------------------------- */
-/*  Helpers                                                                   */
+/* Helpers                                                                    */
 /* -------------------------------------------------------------------------- */
 
 function getInitials(name = "", email = "") {
@@ -42,11 +40,9 @@ function resolveUser(authUser) {
       role: authUser.role || "Dealer",
     };
   }
-
   try {
     const token = localStorage.getItem("token");
     if (!token) return { name: "", email: "Signed in", role: "Dealer" };
-
     const payload = JSON.parse(atob(token.split(".")[1] || ""));
     return {
       name: payload.name || payload.username || "",
@@ -58,26 +54,37 @@ function resolveUser(authUser) {
   }
 }
 
+/**
+ * Cartoon avatar via DiceBear — unique & stable per user.
+ * Styles: avataaars | bottts | lorelei | personas | fun-emoji | shapes
+ */
+function getAvatarUrl(email = "", name = "") {
+  const seed = encodeURIComponent((email || name || "user").toLowerCase().trim());
+  return `https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
+}
+
 /* -------------------------------------------------------------------------- */
-/*  Navbar                                                                    */
+/* Navbar                                                                     */
 /* -------------------------------------------------------------------------- */
 
 const Navbar = () => {
   const navigate = useNavigate();
   const auth = useAuth();
   const { logout } = auth;
-
   const user = resolveUser(auth.user);
   const isAdmin = user.role === "admin";
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [modalType, setModalType] = useState(null); // "profile" | "settings" | null
-  
+
   // Interactive state for profile modification
   const [profileName, setProfileName] = useState(user.name);
   const [profileEmail, setProfileEmail] = useState(user.email);
   const [isSaving, setIsSaving] = useState(false);
   const [successToast, setSuccessToast] = useState(false);
+
+  // Cartoon avatar — unique per user
+  const avatarUrl = getAvatarUrl(user.email, user.name);
 
   const menuRef = useRef(null);
 
@@ -122,7 +129,7 @@ const Navbar = () => {
   };
 
   const initials = getInitials(user.name, user.email);
-  
+
   const formatNameFromEmail = (email) => {
     if (!email || email === "Signed in") return "User";
     const localPart = email.split("@")[0];
@@ -144,7 +151,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur-xl px-4 sm:px-6">
+      <nav className="sticky top-0 z-45 flex h-16 items-center justify-between border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur-xl px-4 sm:px-6">
         {/* Brand */}
         <div className="flex items-center gap-6 min-w-0">
           <Link to="/dashboard" className="flex items-center gap-3 group shrink-0">
@@ -189,9 +196,20 @@ const Navbar = () => {
                 : "border-zinc-800 bg-zinc-900/60 hover:border-zinc-700 hover:bg-zinc-900",
             ].join(" ")}
           >
-            {/* Avatar */}
-            <span className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-red-500 to-rose-600 text-[11px] font-bold text-white shadow-inner">
-              {initials}
+            {/* Cartoon avatar — unique per user */}
+            <span className="relative flex h-8 w-8 items-center justify-center rounded-lg overflow-hidden bg-zinc-800 shadow-inner shrink-0">
+              <img
+                src={avatarUrl}
+                alt={displayName}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                  e.currentTarget.nextSibling?.classList.remove("hidden");
+                }}
+              />
+              <span className="hidden absolute inset-0 flex items-center justify-center bg-zinc-800 text-[11px] font-bold text-white">
+                {initials}
+              </span>
               <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-zinc-950 bg-emerald-400" />
             </span>
 
@@ -222,8 +240,15 @@ const Navbar = () => {
               {/* User header */}
               <div className="px-4 py-3.5 border-b border-zinc-800/80">
                 <div className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-rose-600 text-sm font-bold text-white">
-                    {initials}
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl overflow-hidden bg-zinc-800 shrink-0">
+                    <img
+                      src={avatarUrl}
+                      alt={displayName}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
                   </span>
                   <div className="min-w-0">
                     <p className="text-[13px] font-semibold text-white truncate">
@@ -315,16 +340,19 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Modern & Premium Profile Modal / Settings Modal */}
+      {/* Profile / Settings Modal */}
       {modalType && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fadeIn">
           <div className="w-full max-w-lg rounded-3xl border border-zinc-800/80 bg-zinc-950 shadow-2xl shadow-red-950/20 overflow-hidden relative">
-            
             {/* Modal Header */}
             <div className="relative px-6 pt-6 pb-5 border-b border-zinc-800/80 bg-gradient-to-b from-zinc-900/60 to-transparent flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-2 text-red-500 text-xs font-semibold uppercase tracking-widest mb-1">
-                  {modalType === "profile" ? <BadgeCheck className="w-3.5 h-3.5" /> : <Settings className="w-3.5 h-3.5" />}
+                  {modalType === "profile" ? (
+                    <BadgeCheck className="w-3.5 h-3.5" />
+                  ) : (
+                    <Settings className="w-3.5 h-3.5" />
+                  )}
                   {modalType === "profile" ? "Account Control" : "Configuration"}
                 </div>
                 <h3 className="text-xl font-bold tracking-tight text-white capitalize">
@@ -346,8 +374,12 @@ const Navbar = () => {
                   {/* Banner / Avatar Section */}
                   <div className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-900/50 border border-zinc-800/60">
                     <div className="relative group">
-                      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-red-500 to-rose-600 text-xl font-extrabold text-white shadow-lg">
-                        {initials}
+                      <div className="flex h-16 w-16 items-center justify-center rounded-2xl overflow-hidden bg-zinc-800 shadow-lg">
+                        <img
+                          src={avatarUrl}
+                          alt={displayName}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                       <div className="absolute inset-0 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
                         <Camera className="w-5 h-5 text-white" />
@@ -355,7 +387,12 @@ const Navbar = () => {
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-white">{displayName}</h4>
-                      <p className="text-xs text-zinc-400 mt-0.5">Role: <span className="text-red-400 uppercase font-semibold">{user.role}</span></p>
+                      <p className="text-xs text-zinc-400 mt-0.5">
+                        Role:{" "}
+                        <span className="text-red-400 uppercase font-semibold">
+                          {user.role}
+                        </span>
+                      </p>
                       <span className="inline-flex items-center gap-1 mt-2 text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full font-medium">
                         ● Active Status
                       </span>
@@ -376,7 +413,6 @@ const Navbar = () => {
                         className="w-full h-11 px-3.5 rounded-xl bg-zinc-900 border border-zinc-800 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-red-500 transition-colors"
                       />
                     </div>
-
                     <div>
                       <label className="block text-xs font-medium text-zinc-400 mb-1.5 flex items-center gap-1.5">
                         <Mail className="w-3.5 h-3.5 text-zinc-500" /> Email Address
@@ -414,21 +450,35 @@ const Navbar = () => {
                   <div className="p-4 rounded-2xl bg-zinc-900/50 border border-zinc-800/60 space-y-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="text-xs font-bold text-white">Email Notifications</h4>
-                        <p className="text-[11px] text-zinc-400">Receive alerts regarding vehicle updates</p>
+                        <h4 className="text-xs font-bold text-white">
+                          Email Notifications
+                        </h4>
+                        <p className="text-[11px] text-zinc-400">
+                          Receive alerts regarding vehicle updates
+                        </p>
                       </div>
-                      <input type="checkbox" defaultChecked className="w-4 h-4 accent-red-600 cursor-pointer" />
+                      <input
+                        type="checkbox"
+                        defaultChecked
+                        className="w-4 h-4 accent-red-600 cursor-pointer"
+                      />
                     </div>
                     <hr className="border-zinc-800" />
                     <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="text-xs font-bold text-white">High Contrast Theme</h4>
-                        <p className="text-[11px] text-zinc-400">Enhance UI borders and text layout</p>
+                        <h4 className="text-xs font-bold text-white">
+                          High Contrast Theme
+                        </h4>
+                        <p className="text-[11px] text-zinc-400">
+                          Enhance UI borders and text layout
+                        </p>
                       </div>
-                      <input type="checkbox" className="w-4 h-4 accent-red-600 cursor-pointer" />
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 accent-red-600 cursor-pointer"
+                      />
                     </div>
                   </div>
-
                   <div className="flex items-center justify-end gap-3 pt-4 border-t border-zinc-800/80">
                     <button
                       onClick={() => setModalType(null)}
