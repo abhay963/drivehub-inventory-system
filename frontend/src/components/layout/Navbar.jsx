@@ -114,7 +114,7 @@ const Navbar = () => {
             <Flame className="w-4 h-4" />
           </div>
           <span className="text-[15px] font-bold tracking-tight text-white">
-            Drive<span className="text-red-500">Vault</span>
+            Drive<span className="text-red-500">Hub</span>
           </span>
         </Link>
 

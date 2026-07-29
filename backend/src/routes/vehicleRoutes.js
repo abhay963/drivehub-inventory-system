@@ -3,7 +3,7 @@ import express from "express";
 import protect from "../middleware/authMiddleware.js";
 import admin from "../middleware/adminMiddleware.js";
 
-import { createVehicle,  getAllVehicles,getInventorySummary, getVehicleById, updateVehicle,searchVehicles, purchaseVehicle,deleteVehicle } from "../controllers/vehicleController.js";
+import { createVehicle,  getAllVehicles,getInventorySummary, getVehicleById, updateVehicle,searchVehicles, purchaseVehicle,deleteVehicle,restockVehicle } from "../controllers/vehicleController.js";
 
 const router = express.Router();
 

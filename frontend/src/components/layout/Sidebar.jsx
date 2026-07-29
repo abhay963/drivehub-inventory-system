@@ -14,7 +14,14 @@ const allLinks = [
 const Sidebar = () => {
   // Role check based on localStorage user object
   const user = JSON.parse(localStorage.getItem("user"));
-  const isAdmin = user?.role === "admin";
+ 
+
+console.log(user);
+console.log(user?.role);
+
+const isAdmin = user?.role === "admin";
+
+console.log(isAdmin);
 
   // Filter links based on user role
   const links = allLinks.filter((link) => !link.adminOnly || isAdmin);

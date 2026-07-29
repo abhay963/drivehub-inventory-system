@@ -204,3 +204,37 @@ export const getInventorySummary = async (req, res) => {
 };
 
 
+
+
+export const restockVehicle = async (req, res) => {
+  try {
+    const { quantity } = req.body;
+
+    const vehicle = await Vehicle.findById(req.params.id);
+
+    if (!vehicle) {
+      return res.status(404).json({
+        message: "Vehicle not found",
+      });
+    }
+
+    if (!quantity || quantity <= 0) {
+      return res.status(400).json({
+        message: "Quantity must be greater than 0",
+      });
+    }
+
+    vehicle.quantity += quantity;
+
+    await vehicle.save();
+
+    res.status(200).json({
+      message: "Vehicle restocked successfully",
+      vehicle,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};

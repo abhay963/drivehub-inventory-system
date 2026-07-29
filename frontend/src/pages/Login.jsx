@@ -44,8 +44,11 @@ const Login = () => {
         email: data.email.trim().toLowerCase(),
         password: data.password,
       });
-      localStorage.setItem("token", response.token);
-      login(response.token);
+    localStorage.setItem("token", response.token);
+localStorage.setItem("user", JSON.stringify(response.user));
+
+login(response.token);
+     
       toast.success("Ignition sequence complete. Welcome back!");
       navigate("/dashboard");
     } catch (err) {

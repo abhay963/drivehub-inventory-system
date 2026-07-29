@@ -17,7 +17,6 @@ import {
   Plus,
   Search,
   ArrowRight,
-  PackagePlus,
   ShoppingCart,
   Gauge,
   Calendar,
@@ -206,6 +205,14 @@ function ProgressRow({ label, value, max, color = "bg-red-500" }) {
   );
 }
 
+function EmptyChart() {
+  return (
+    <div className="flex items-center justify-center h-full text-xs text-zinc-500">
+      No data available
+    </div>
+  );
+}
+
 /* -------------------------------------------------------------------------- */
 /*  Dashboard                                                                 */
 /* -------------------------------------------------------------------------- */
@@ -219,6 +226,11 @@ const Dashboard = () => {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Retrieve user role from localStorage or auth state
+  // Adjust this depending on how your app stores user role (e.g., localStorage.getItem('role') or user.role)
+  const userRole = localStorage.getItem("role") || "user"; 
+  const isUser = userRole.toLowerCase() === "user";
 
   useEffect(() => {
     fetchData();
@@ -383,16 +395,6 @@ const Dashboard = () => {
     });
   }, [summary]);
 
-  const topValueVehicles = useMemo(() => {
-    return [...vehicles]
-      .map((v) => ({
-        ...v,
-        lineValue: (Number(v.price) || 0) * (Number(v.quantity) || 0),
-      }))
-      .sort((a, b) => b.lineValue - a.lineValue)
-      .slice(0, 6);
-  }, [vehicles]);
-
   const maxCategoryUnits = useMemo(
     () => Math.max(1, ...categoryData.map((c) => c.value), 1),
     [categoryData]
@@ -492,13 +494,15 @@ const Dashboard = () => {
               <Search className="w-3.5 h-3.5" />
               Inventory
             </Link>
-            <Link
-              to="/add-vehicle"
-              className="inline-flex items-center gap-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold px-4 py-2 text-[13px] shadow-lg shadow-red-600/20 transition-all"
-            >
-              <Plus className="w-4 h-4" />
-              Add vehicle
-            </Link>
+            {!isUser && (
+              <Link
+                to="/add-vehicle"
+                className="inline-flex items-center gap-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold px-4 py-2 text-[13px] shadow-lg shadow-red-600/20 transition-all"
+              >
+                <Plus className="w-4 h-4" />
+                Add vehicle
+              </Link>
+            )}
           </div>
         </motion.div>
 
@@ -511,8 +515,8 @@ const Dashboard = () => {
           </motion.div>
         )}
 
-        {/* KPI row — 6 cards */}
-        <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        {/* KPI row — remaining cards (Low stock, Out of stock, and Categories cards removed) */}
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           <StatCard
             icon={Car}
             label="Models"
@@ -533,27 +537,6 @@ const Dashboard = () => {
             value={formatINR(summary.totalValue)}
             accent="violet"
             hint="Price × qty"
-          />
-          <StatCard
-            icon={AlertTriangle}
-            label="Low stock"
-            value={lowStock.length}
-            accent="amber"
-            hint="Qty 1–3"
-          />
-          <StatCard
-            icon={XCircle}
-            label="Out of stock"
-            value={outOfStock.length}
-            accent="rose"
-            hint="Qty = 0"
-          />
-          <StatCard
-            icon={Tag}
-            label="Categories"
-            value={categoryCount}
-            accent="cyan"
-            hint={`Avg ${formatINR(avgPrice)}`}
           />
         </div>
 
@@ -612,13 +595,15 @@ const Dashboard = () => {
             <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 mb-1">
               Quick actions
             </p>
-            <Link
-              to="/add-vehicle"
-              className="flex items-center gap-2 text-[13px] text-zinc-300 hover:text-white transition-colors"
-            >
-              <Plus className="w-3.5 h-3.5 text-red-400" /> Add vehicle
-              <ArrowRight className="w-3 h-3 ml-auto text-zinc-600" />
-            </Link>
+            {!isUser && (
+              <Link
+                to="/add-vehicle"
+                className="flex items-center gap-2 text-[13px] text-zinc-300 hover:text-white transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5 text-red-400" /> Add vehicle
+                <ArrowRight className="w-3 h-3 ml-auto text-zinc-600" />
+              </Link>
+            )}
             <Link
               to="/inventory"
               className="flex items-center gap-2 text-[13px] text-zinc-300 hover:text-white transition-colors"
@@ -964,13 +949,7 @@ const Dashboard = () => {
                 <EmptyChart />
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={yearData}>
-                    <defs>
-                      <linearGradient id="yearFill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#06b6d4" stopOpacity={0.35} />
-                        <stop offset="100%" stopColor="#06b6d4" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
+                  <BarChart data={yearData}>
                     <CartesianGrid stroke="#27272a" strokeDasharray="3 3" />
                     <XAxis
                       dataKey="name"
@@ -988,22 +967,21 @@ const Dashboard = () => {
                       contentStyle={tooltipStyle}
                       formatter={(v) => [`${v} units`, "Stock"]}
                     />
-                    <Area
-                      type="monotone"
+                    <Bar
                       dataKey="units"
-                      stroke="#06b6d4"
-                      strokeWidth={2}
-                      fill="url(#yearFill)"
+                      fill="#06b6d4"
+                      radius={[6, 6, 0, 0]}
+                      maxBarSize={32}
                     />
-                  </AreaChart>
+                  </BarChart>
                 </ResponsiveContainer>
               )}
             </div>
           </ChartCard>
 
           <ChartCard
-            title="Price distribution"
-            subtitle="Units by list-price band"
+            title="Price distribution bands"
+            subtitle="Units by pricing bracket"
             icon={Tag}
           >
             <div className="h-[240px] w-full">
@@ -1012,7 +990,7 @@ const Dashboard = () => {
                   <CartesianGrid stroke="#27272a" strokeDasharray="3 3" />
                   <XAxis
                     dataKey="name"
-                    tick={{ fill: "#71717a", fontSize: 10 }}
+                    tick={{ fill: "#71717a", fontSize: 11 }}
                     axisLine={{ stroke: "#3f3f46" }}
                     tickLine={false}
                   />
@@ -1020,240 +998,26 @@ const Dashboard = () => {
                     tick={{ fill: "#71717a", fontSize: 11 }}
                     axisLine={false}
                     tickLine={false}
-                    width={32}
+                    width={36}
                   />
                   <Tooltip
                     contentStyle={tooltipStyle}
-                    formatter={(v) => [`${v} units`, "Stock"]}
+                    formatter={(v) => [`${v} units`, "Models"]}
                   />
                   <Bar
                     dataKey="count"
                     fill="#f97316"
                     radius={[6, 6, 0, 0]}
-                    maxBarSize={40}
+                    maxBarSize={32}
                   />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </ChartCard>
         </div>
-
-        {/* Alerts tables */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <ChartCard
-            title="Low stock alerts"
-            subtitle="Qty between 1 and 3 — restock soon"
-            icon={AlertTriangle}
-            action={
-              <Link
-                to="/inventory"
-                className="text-[12px] text-red-400 hover:text-red-300 font-medium"
-              >
-                Open inventory
-              </Link>
-            }
-          >
-            <div className="overflow-x-auto max-h-[280px] overflow-y-auto">
-              <table className="w-full text-left text-[13px]">
-                <thead className="sticky top-0 bg-zinc-900/95">
-                  <tr className="border-b border-zinc-800 text-[11px] uppercase tracking-wider text-zinc-500">
-                    <th className="py-2 pr-3 font-medium">Vehicle</th>
-                    <th className="py-2 pr-3 font-medium">Category</th>
-                    <th className="py-2 font-medium">Qty</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-800/80">
-                  {lowStock.length === 0 ? (
-                    <tr>
-                      <td colSpan={3} className="py-8 text-center text-zinc-500">
-                        No low-stock items
-                      </td>
-                    </tr>
-                  ) : (
-                    lowStock.map((v) => (
-                      <tr key={v._id} className="hover:bg-white/[0.02]">
-                        <td className="py-2.5 pr-3 text-white font-medium">
-                          {v.brand} {v.model}
-                        </td>
-                        <td className="py-2.5 pr-3 text-zinc-400">
-                          {v.category}
-                        </td>
-                        <td className="py-2.5">
-                          <span className="inline-flex rounded-full border border-amber-500/25 bg-amber-500/10 px-2 py-0.5 text-[11px] font-semibold text-amber-400">
-                            {v.quantity}
-                          </span>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </ChartCard>
-
-          <ChartCard
-            title="Out of stock"
-            subtitle="Purchase disabled until restock"
-            icon={XCircle}
-            action={
-              <Link
-                to="/inventory"
-                className="text-[12px] text-red-400 hover:text-red-300 font-medium inline-flex items-center gap-1"
-              >
-                <PackagePlus className="w-3.5 h-3.5" /> Restock
-              </Link>
-            }
-          >
-            <div className="overflow-x-auto max-h-[280px] overflow-y-auto">
-              <table className="w-full text-left text-[13px]">
-                <thead className="sticky top-0 bg-zinc-900/95">
-                  <tr className="border-b border-zinc-800 text-[11px] uppercase tracking-wider text-zinc-500">
-                    <th className="py-2 pr-3 font-medium">Vehicle</th>
-                    <th className="py-2 pr-3 font-medium">Price</th>
-                    <th className="py-2 font-medium">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-800/80">
-                  {outOfStock.length === 0 ? (
-                    <tr>
-                      <td colSpan={3} className="py-8 text-center text-zinc-500">
-                        All models have stock
-                      </td>
-                    </tr>
-                  ) : (
-                    outOfStock.map((v) => (
-                      <tr key={v._id} className="hover:bg-white/[0.02]">
-                        <td className="py-2.5 pr-3 text-white font-medium">
-                          {v.brand} {v.model}
-                        </td>
-                        <td className="py-2.5 pr-3 text-zinc-400 tabular-nums">
-                          {formatINR(v.price)}
-                        </td>
-                        <td className="py-2.5">
-                          <span className="inline-flex rounded-full border border-rose-500/25 bg-rose-500/10 px-2 py-0.5 text-[11px] font-semibold text-rose-400">
-                            Out of stock
-                          </span>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </ChartCard>
-        </div>
-
-        {/* Highest value lines */}
-        <ChartCard
-          title="Highest inventory lines"
-          subtitle="Top models by price × quantity"
-          icon={IndianRupee}
-          action={
-            <Link
-              to="/inventory"
-              className="text-[12px] text-red-400 hover:text-red-300 font-medium"
-            >
-              View all
-            </Link>
-          }
-        >
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] text-left text-[13px]">
-              <thead>
-                <tr className="border-b border-zinc-800 text-[11px] uppercase tracking-wider text-zinc-500">
-                  <th className="py-3 pr-4 font-medium">#</th>
-                  <th className="py-3 pr-4 font-medium">Brand / Model</th>
-                  <th className="py-3 pr-4 font-medium">Category</th>
-                  <th className="py-3 pr-4 font-medium">Year</th>
-                  <th className="py-3 pr-4 font-medium">Unit price</th>
-                  <th className="py-3 pr-4 font-medium">Qty</th>
-                  <th className="py-3 font-medium">Line value</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800/80">
-                {topValueVehicles.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="py-10 text-center text-zinc-500">
-                      No vehicles in catalog yet.{" "}
-                      <Link to="/add-vehicle" className="text-red-400 hover:underline">
-                        Add one
-                      </Link>
-                    </td>
-                  </tr>
-                ) : (
-                  topValueVehicles.map((v, i) => (
-                    <tr key={v._id} className="hover:bg-white/[0.02]">
-                      <td className="py-3 pr-4 text-zinc-600">{i + 1}</td>
-                      <td className="py-3 pr-4 font-semibold text-white">
-                        {v.brand} {v.model}
-                      </td>
-                      <td className="py-3 pr-4">
-                        <span className="rounded-lg border border-zinc-700/60 bg-zinc-800/40 px-2 py-0.5 text-[11px] text-zinc-300">
-                          {v.category}
-                        </span>
-                      </td>
-                      <td className="py-3 pr-4 text-zinc-400 tabular-nums">
-                        {v.year}
-                      </td>
-                      <td className="py-3 pr-4 text-zinc-300 tabular-nums">
-                        {formatINR(v.price)}
-                      </td>
-                      <td className="py-3 pr-4 text-zinc-300 tabular-nums">
-                        {v.quantity}
-                      </td>
-                      <td className="py-3 font-semibold text-white tabular-nums">
-                        {formatINR(v.lineValue)}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </ChartCard>
-
-        {/* Bottom CTA */}
-        <motion.div
-          variants={item}
-          className="rounded-2xl border border-zinc-800 bg-gradient-to-r from-zinc-900/80 via-zinc-900/40 to-red-950/20 p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-        >
-          <div>
-            <h3 className="text-lg font-bold text-white tracking-tight">
-              Keep the lot moving
-            </h3>
-            <p className="text-sm text-zinc-400 mt-1 max-w-md">
-              Search inventory, purchase units when stock allows, or restock
-              models that hit zero — all protected behind JWT routes.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Link
-              to="/inventory"
-              className="inline-flex items-center gap-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold px-5 py-2.5 text-[13px] transition-all"
-            >
-              Go to inventory
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
-              to="/add-vehicle"
-              className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 text-zinc-300 hover:text-white px-5 py-2.5 text-[13px] font-medium transition-all"
-            >
-              <Plus className="w-4 h-4" />
-              Add vehicle
-            </Link>
-          </div>
-        </motion.div>
       </motion.div>
     </Layout>
   );
 };
-
-function EmptyChart() {
-  return (
-    <div className="h-full min-h-[120px] flex items-center justify-center text-sm text-zinc-500">
-      No vehicle data yet
-    </div>
-  );
-}
 
 export default Dashboard;
