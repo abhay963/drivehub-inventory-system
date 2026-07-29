@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-
+import AdminSales from "./pages/AdminSales";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -55,7 +55,17 @@ function App() {
     </ProtectedRoute>
   }
 />
-
+<Route
+    path="/admin-sales"
+    
+    element=
+    {
+   
+    
+    <ProtectedRoute>
+             <AdminSales />
+            </ProtectedRoute>}
+/>
         <Route
           path="/edit-vehicle/:id"
           element={

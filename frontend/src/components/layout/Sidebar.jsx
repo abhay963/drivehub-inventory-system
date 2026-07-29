@@ -4,6 +4,7 @@ import {
   Package,
   PlusCircle,
   ShoppingBag,
+   ReceiptText
 } from "lucide-react";
 
 const allLinks = [
@@ -11,6 +12,12 @@ const allLinks = [
   { to: "/inventory", label: "Inventory", icon: Package },
   { to: "/add-vehicle", label: "Add Vehicle", icon: PlusCircle, adminOnly: true },
   { to: "/purchases", label: "Purchase History", icon: ShoppingBag, userOnly: true },
+  {
+    to: "/admin-sales",
+    label: "Sales",
+    icon: ReceiptText,
+    adminOnly: true,
+  },
 ];
 
 const Sidebar = () => {
