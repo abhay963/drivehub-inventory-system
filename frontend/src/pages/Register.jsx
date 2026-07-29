@@ -18,12 +18,9 @@ import {
   Flame,
   ShieldAlert,
   Gauge,
+  ArrowLeft,
 } from "lucide-react";
 import { registerUser } from "../services/authService";
-
-/* -------------------------------------------------------------------------- */
-/*  Zod Schema                                                                */
-/* -------------------------------------------------------------------------- */
 
 const registerSchema = z
   .object({
@@ -33,9 +30,7 @@ const registerSchema = z
       .min(3, "Name must be at least 3 characters")
       .max(40, "Name cannot exceed 40 characters")
       .regex(/^[A-Za-z ]+$/, "Only letters and spaces are allowed"),
-
-    email: z.string().trim().email("Please enter a valid fleet email address"),
-
+    email: z.string().trim().email("Please enter a valid email address"),
     password: z
       .string()
       .min(8, "Password must be at least 8 characters")
@@ -46,17 +41,12 @@ const registerSchema = z
         /[!@#$%^&*(),.?":{}|<>]/,
         "At least one special character is required"
       ),
-
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
-
-/* -------------------------------------------------------------------------- */
-/*  Password Strength Helpers                                                 */
-/* -------------------------------------------------------------------------- */
 
 const STRENGTH_LABELS = ["Weak", "Fair", "Good", "Strong", "Strong"];
 const STRENGTH_COLORS = [
@@ -73,10 +63,6 @@ const STRENGTH_TEXT = [
   "text-emerald-400",
   "text-emerald-400",
 ];
-
-/* -------------------------------------------------------------------------- */
-/*  Animation Variants                                                        */
-/* -------------------------------------------------------------------------- */
 
 const pageVariants = {
   hidden: { opacity: 0 },
@@ -101,10 +87,6 @@ const errorVariants = {
     transition: { duration: 0.15 },
   },
 };
-
-/* -------------------------------------------------------------------------- */
-/*  Component                                                                 */
-/* -------------------------------------------------------------------------- */
 
 const Register = () => {
   const navigate = useNavigate();
@@ -139,9 +121,10 @@ const Register = () => {
 
   const strengthScore = strength?.score ?? 0;
 
-  /* Field validity helpers (dirty + no error) */
-  const isNameValid = dirtyFields.name && !errors.name && nameValue?.length >= 3;
-  const isEmailValid = dirtyFields.email && !errors.email && emailValue?.includes("@");
+  const isNameValid =
+    dirtyFields.name && !errors.name && nameValue?.length >= 3;
+  const isEmailValid =
+    dirtyFields.email && !errors.email && emailValue?.includes("@");
   const isPasswordValid =
     dirtyFields.password && !errors.password && passwordValue.length >= 8;
   const isConfirmValid =
@@ -159,14 +142,12 @@ const Register = () => {
       };
 
       await registerUser(payload);
-
-      toast.success("Ignition sequence complete. Welcome to the fleet!");
-
-      setTimeout(() => {
-        navigate("/login");
-      }, 1500);
+      toast.success("Account created successfully");
+      setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Registration Failed. Check your clearance.");
+      toast.error(
+        err.response?.data?.message || "Registration failed. Please try again."
+      );
     }
   };
 
@@ -175,299 +156,330 @@ const Register = () => {
       variants={pageVariants}
       initial="hidden"
       animate="visible"
-      className="min-h-screen grid grid-cols-1 lg:grid-cols-12 bg-zinc-950 text-white font-sans overflow-hidden"
+      className="min-h-screen bg-zinc-950 text-white font-sans"
     >
-      
-      {/* Left Immersive Exotic Car Visual Showcase */}
-      <div className="hidden lg:flex lg:col-span-7 relative overflow-hidden bg-zinc-950">
-        {/* High-octane luxury car background image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center scale-105 transition-transform duration-1000 hover:scale-100"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2000&auto=format&fit=crop')`,
-          }}
-        />
-        
-        {/* Cinematic Multi-stop Dark Gradient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/80 via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-red-950/20 mix-blend-color-burn" />
+      {/* Navbar */}
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-900/80 bg-zinc-950/90 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 sm:px-8 h-14">
+          <Link to="/" className="flex items-center gap-2.5">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-red-600 text-white shadow-lg shadow-red-600/40">
+              <Flame className="w-4 h-4" />
+            </div>
+            <span className="text-sm font-black tracking-widest uppercase bg-gradient-to-r from-white via-zinc-200 to-red-500 bg-clip-text text-transparent">
+              DriveHub
+            </span>
+          </Link>
 
-        {/* Top Brand Badge */}
-        <div className="relative z-10 p-12 flex items-center gap-3">
-          <div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-red-600 text-white shadow-lg shadow-red-600/50">
-            <Flame className="w-6 h-6 animate-pulse" />
-          </div>
-          <span className="text-xl font-black tracking-widest uppercase bg-gradient-to-r from-white via-zinc-200 to-red-500 bg-clip-text text-transparent">
-            RevMotors
-          </span>
-        </div>
-
-        {/* Bottom Floating Telemetry Card */}
-        <div className="relative z-10 mt-auto p-12 w-full">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="backdrop-blur-xl bg-zinc-900/60 border border-zinc-700/50 p-6 rounded-3xl shadow-2xl max-w-lg flex items-center justify-between gap-6"
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-400 hover:text-white transition-colors"
           >
-            <div>
-              <p className="text-xs uppercase tracking-widest text-red-500 font-bold mb-1">Global Dealership Network</p>
-              <h3 className="text-lg font-bold text-white tracking-tight">Register for Secure Allocation</h3>
-              <p className="text-xs text-zinc-400 mt-1">Gain instant access to premier exotic inventory feeds.</p>
-            </div>
-            <div className="w-14 h-14 rounded-2xl bg-red-600/20 border border-red-500/40 flex items-center justify-center shrink-0">
-              <Gauge className="w-7 h-7 text-red-500" />
-            </div>
-          </motion.div>
+            <ArrowLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Back to home</span>
+            <span className="sm:hidden">Home</span>
+          </Link>
         </div>
-      </div>
+      </header>
 
-      {/* Right High-End Registration Interface */}
-      <div className="lg:col-span-5 flex items-center justify-center p-6 sm:p-10 lg:p-12 relative bg-zinc-950 overflow-y-auto max-h-screen">
-        {/* Subtle red background ambient glow */}
-        <div className="absolute -top-24 -right-24 w-80 h-80 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
+      {/* Main content – accounts for navbar height */}
+      <div className="pt-14 min-h-screen grid grid-cols-1 lg:grid-cols-12">
+        {/* Left panel */}
+        <div className="hidden lg:flex lg:col-span-7 relative overflow-hidden bg-zinc-900">
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: `url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2000&auto=format&fit=crop')`,
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/50 to-zinc-950/20" />
+          <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/70 via-transparent to-transparent" />
 
-        <motion.div 
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full max-w-md space-y-6 relative z-10 py-6"
-        >
-          {/* Mobile view top brand */}
-          <div className="lg:hidden flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center">
-              <Flame className="w-5 h-5" />
+          {/* Bottom card only – no duplicate logo */}
+          <div className="relative z-10 mt-auto p-10 w-full">
+            <div className="backdrop-blur-xl bg-zinc-900/70 border border-zinc-700/50 p-5 rounded-2xl shadow-2xl max-w-md flex items-center justify-between gap-5">
+              <div>
+                <p className="text-[11px] uppercase tracking-widest text-red-500 font-bold mb-1">
+                  Dealership network
+                </p>
+                <h3 className="text-base font-bold text-white tracking-tight">
+                  Create your account
+                </h3>
+                <p className="text-xs text-zinc-400 mt-0.5">
+                  Get access to inventory, pricing, and sales tools.
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-xl bg-red-600/20 border border-red-500/40 flex items-center justify-center shrink-0">
+                <Gauge className="w-6 h-6 text-red-500" />
+              </div>
             </div>
-            <span className="font-black tracking-widest text-lg uppercase text-red-500">RevMotors</span>
           </div>
+        </div>
 
-          <div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">Request Access</h2>
-            <p className="text-sm text-zinc-400 mt-1.5">
-              Create your dealer account to oversee inventory, pricing, and client allocations.
-            </p>
-          </div>
+        {/* Right panel – form */}
+        <div className="lg:col-span-5 flex items-start lg:items-center justify-center px-6 py-10 sm:px-10 lg:px-12 relative bg-zinc-950 overflow-y-auto">
+          <div className="absolute -top-20 -right-20 w-72 h-72 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-            {/* Name Field */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                Full Name
-              </label>
-              <div className="relative group">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-red-500 transition-colors pointer-events-none" />
-                <input
-                  type="text"
-                  placeholder="John Doe"
-                  {...register("name")}
-                  className={`w-full bg-zinc-900/90 border rounded-2xl px-12 py-3.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-4 transition-all shadow-inner ${
-                    errors.name
-                      ? "border-red-500/70 focus:border-red-500 focus:ring-red-600/20"
-                      : isNameValid
-                      ? "border-emerald-500/60 focus:border-emerald-500 focus:ring-emerald-600/20"
-                      : "border-zinc-800 focus:border-red-600 focus:ring-red-600/20"
-                  }`}
-                />
-                {isNameValid && (
-                  <CheckCircle2 className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400" />
-                )}
+          <motion.div
+            initial={{ opacity: 0, x: 16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full max-w-md space-y-6 relative z-10"
+          >
+            {/* Mobile brand */}
+            <div className="lg:hidden flex items-center gap-2.5 mb-2">
+              <div className="w-9 h-9 rounded-lg bg-red-600 text-white flex items-center justify-center">
+                <Flame className="w-4.5 h-4.5" />
               </div>
-              <AnimatePresence mode="wait">
-                {errors.name && (
-                  <motion.p
-                    variants={errorVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    className="text-xs text-red-500 font-medium pl-1 flex items-center gap-1 mt-1"
-                  >
-                    <ShieldAlert className="w-3.5 h-3.5 shrink-0" /> {errors.name.message}
-                  </motion.p>
-                )}
-              </AnimatePresence>
+              <span className="font-black tracking-widest text-base uppercase text-red-500">
+                DriveHub
+              </span>
             </div>
 
-            {/* Email Field */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                Dealer Email
-              </label>
-              <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-red-500 transition-colors pointer-events-none" />
-                <input
-                  type="email"
-                  placeholder="admin@revmotors.com"
-                  {...register("email")}
-                  className={`w-full bg-zinc-900/90 border rounded-2xl px-12 py-3.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-4 transition-all shadow-inner ${
-                    errors.email
-                      ? "border-red-500/70 focus:border-red-500 focus:ring-red-600/20"
-                      : isEmailValid
-                      ? "border-emerald-500/60 focus:border-emerald-500 focus:ring-emerald-600/20"
-                      : "border-zinc-800 focus:border-red-600 focus:ring-red-600/20"
-                  }`}
-                />
-                {isEmailValid && (
-                  <CheckCircle2 className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400" />
-                )}
-              </div>
-              <AnimatePresence mode="wait">
-                {errors.email && (
-                  <motion.p
-                    variants={errorVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    className="text-xs text-red-500 font-medium pl-1 flex items-center gap-1 mt-1"
-                  >
-                    <ShieldAlert className="w-3.5 h-3.5 shrink-0" /> {errors.email.message}
-                  </motion.p>
-                )}
-              </AnimatePresence>
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+                Create account
+              </h2>
+              <p className="text-sm text-zinc-400 mt-1.5">
+                Create an account to manage inventory, pricing, and sales.
+              </p>
             </div>
 
-            {/* Password Field */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                Secure Password
-              </label>
-              <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-red-500 transition-colors pointer-events-none" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  {...register("password")}
-                  className={`w-full bg-zinc-900/90 border rounded-2xl px-12 py-3.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-4 transition-all shadow-inner ${
-                    errors.password
-                      ? "border-red-500/70 focus:border-red-500 focus:ring-red-600/20"
-                      : isPasswordValid
-                      ? "border-emerald-500/60 focus:border-emerald-500 focus:ring-emerald-600/20"
-                      : "border-zinc-800 focus:border-red-600 focus:ring-red-600/20"
-                  }`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors focus:outline-none"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-
-              {/* Password strength meter */}
-              {passwordValue.length > 0 && (
-                <div className="mt-2.5 space-y-1.5">
-                  <div className="flex gap-1">
-                    {[0, 1, 2, 3].map((i) => (
-                      <div
-                        key={i}
-                        className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                          i <= strengthScore
-                            ? STRENGTH_COLORS[strengthScore]
-                            : "bg-zinc-800"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <p className={`text-[11.5px] font-semibold ${STRENGTH_TEXT[strengthScore]}`}>
-                    Strength: {STRENGTH_LABELS[strengthScore]}
-                  </p>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="space-y-4"
+              noValidate
+            >
+              {/* Name */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Full name
+                </label>
+                <div className="relative group">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-500 group-focus-within:text-red-500 transition-colors pointer-events-none" />
+                  <input
+                    type="text"
+                    placeholder="John Doe"
+                    {...register("name")}
+                    className={`w-full bg-zinc-900/90 border rounded-xl px-11 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-4 transition-all ${
+                      errors.name
+                        ? "border-red-500/70 focus:border-red-500 focus:ring-red-600/20"
+                        : isNameValid
+                        ? "border-emerald-500/60 focus:border-emerald-500 focus:ring-emerald-600/20"
+                        : "border-zinc-800 focus:border-red-600 focus:ring-red-600/20"
+                    }`}
+                  />
+                  {isNameValid && (
+                    <CheckCircle2 className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-emerald-400" />
+                  )}
                 </div>
-              )}
+                <AnimatePresence mode="wait">
+                  {errors.name && (
+                    <motion.p
+                      variants={errorVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      className="text-xs text-red-500 font-medium pl-1 flex items-center gap-1"
+                    >
+                      <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
+                      {errors.name.message}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </div>
 
-              <AnimatePresence mode="wait">
-                {errors.password && (
-                  <motion.p
-                    variants={errorVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    className="text-xs text-red-500 font-medium pl-1 flex items-center gap-1 mt-1"
-                  >
-                    <ShieldAlert className="w-3.5 h-3.5 shrink-0" /> {errors.password.message}
-                  </motion.p>
-                )}
-              </AnimatePresence>
-            </div>
+              {/* Email */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Email
+                </label>
+                <div className="relative group">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-500 group-focus-within:text-red-500 transition-colors pointer-events-none" />
+                  <input
+                    type="email"
+                    placeholder="admin@drivehub.app"
+                    {...register("email")}
+                    className={`w-full bg-zinc-900/90 border rounded-xl px-11 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-4 transition-all ${
+                      errors.email
+                        ? "border-red-500/70 focus:border-red-500 focus:ring-red-600/20"
+                        : isEmailValid
+                        ? "border-emerald-500/60 focus:border-emerald-500 focus:ring-emerald-600/20"
+                        : "border-zinc-800 focus:border-red-600 focus:ring-red-600/20"
+                    }`}
+                  />
+                  {isEmailValid && (
+                    <CheckCircle2 className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-emerald-400" />
+                  )}
+                </div>
+                <AnimatePresence mode="wait">
+                  {errors.email && (
+                    <motion.p
+                      variants={errorVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      className="text-xs text-red-500 font-medium pl-1 flex items-center gap-1"
+                    >
+                      <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
+                      {errors.email.message}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </div>
 
-            {/* Confirm Password Field */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                Confirm Password
-              </label>
-              <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-red-500 transition-colors pointer-events-none" />
-                <input
-                  type={showConfirm ? "text" : "password"}
-                  placeholder="••••••••"
-                  {...register("confirmPassword")}
-                  className={`w-full bg-zinc-900/90 border rounded-2xl px-12 py-3.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-4 transition-all shadow-inner ${
-                    errors.confirmPassword
-                      ? "border-red-500/70 focus:border-red-500 focus:ring-red-600/20"
-                      : isConfirmValid
-                      ? "border-emerald-500/60 focus:border-emerald-500 focus:ring-emerald-600/20"
-                      : "border-zinc-800 focus:border-red-600 focus:ring-red-600/20"
-                  }`}
-                />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                  {isConfirmValid && <CheckCircle2 className="w-5 h-5 text-emerald-400" />}
+              {/* Password */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Password
+                </label>
+                <div className="relative group">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-500 group-focus-within:text-red-500 transition-colors pointer-events-none" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    {...register("password")}
+                    className={`w-full bg-zinc-900/90 border rounded-xl px-11 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-4 transition-all ${
+                      errors.password
+                        ? "border-red-500/70 focus:border-red-500 focus:ring-red-600/20"
+                        : isPasswordValid
+                        ? "border-emerald-500/60 focus:border-emerald-500 focus:ring-emerald-600/20"
+                        : "border-zinc-800 focus:border-red-600 focus:ring-red-600/20"
+                    }`}
+                  />
                   <button
                     type="button"
-                    onClick={() => setShowConfirm((prev) => !prev)}
-                    className="text-zinc-500 hover:text-white transition-colors focus:outline-none"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors focus:outline-none"
                   >
-                    {showConfirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? (
+                      <EyeOff className="w-4.5 h-4.5" />
+                    ) : (
+                      <Eye className="w-4.5 h-4.5" />
+                    )}
                   </button>
                 </div>
-              </div>
-              <AnimatePresence mode="wait">
-                {errors.confirmPassword && (
-                  <motion.p
-                    variants={errorVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    className="text-xs text-red-500 font-medium pl-1 flex items-center gap-1 mt-1"
-                  >
-                    <ShieldAlert className="w-3.5 h-3.5 shrink-0" /> {errors.confirmPassword.message}
-                  </motion.p>
-                )}
-              </AnimatePresence>
-            </div>
 
-            {/* Submit Action Button */}
-            <button
-              type="submit"
-              disabled={isSubmitting || !isValid}
-              className="w-full relative group overflow-hidden rounded-2xl bg-red-600 p-px font-semibold shadow-xl shadow-red-600/30 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
-            >
-              <div className="flex items-center justify-center gap-3 w-full bg-gradient-to-r from-red-600 to-rose-600 px-8 py-4 rounded-2xl text-white group-hover:from-red-500 group-hover:to-rose-500 transition-all">
+                {passwordValue.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    <div className="flex gap-1">
+                      {[0, 1, 2, 3].map((i) => (
+                        <div
+                          key={i}
+                          className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                            i <= strengthScore
+                              ? STRENGTH_COLORS[strengthScore]
+                              : "bg-zinc-800"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <p
+                      className={`text-[11px] font-semibold ${STRENGTH_TEXT[strengthScore]}`}
+                    >
+                      Strength: {STRENGTH_LABELS[strengthScore]}
+                    </p>
+                  </div>
+                )}
+
+                <AnimatePresence mode="wait">
+                  {errors.password && (
+                    <motion.p
+                      variants={errorVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      className="text-xs text-red-500 font-medium pl-1 flex items-center gap-1"
+                    >
+                      <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
+                      {errors.password.message}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Confirm password */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Confirm password
+                </label>
+                <div className="relative group">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-500 group-focus-within:text-red-500 transition-colors pointer-events-none" />
+                  <input
+                    type={showConfirm ? "text" : "password"}
+                    placeholder="••••••••"
+                    {...register("confirmPassword")}
+                    className={`w-full bg-zinc-900/90 border rounded-xl px-11 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-4 transition-all ${
+                      errors.confirmPassword
+                        ? "border-red-500/70 focus:border-red-500 focus:ring-red-600/20"
+                        : isConfirmValid
+                        ? "border-emerald-500/60 focus:border-emerald-500 focus:ring-emerald-600/20"
+                        : "border-zinc-800 focus:border-red-600 focus:ring-red-600/20"
+                    }`}
+                  />
+                  <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                    {isConfirmValid && (
+                      <CheckCircle2 className="w-4.5 h-4.5 text-emerald-400" />
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirm((prev) => !prev)}
+                      className="text-zinc-500 hover:text-white transition-colors focus:outline-none"
+                    >
+                      {showConfirm ? (
+                        <EyeOff className="w-4.5 h-4.5" />
+                      ) : (
+                        <Eye className="w-4.5 h-4.5" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+                <AnimatePresence mode="wait">
+                  {errors.confirmPassword && (
+                    <motion.p
+                      variants={errorVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      className="text-xs text-red-500 font-medium pl-1 flex items-center gap-1"
+                    >
+                      <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
+                      {errors.confirmPassword.message}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={isSubmitting || !isValid}
+                className="w-full flex items-center justify-center gap-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold py-3.5 shadow-lg shadow-red-600/25 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-1"
+              >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Engaging Engine...</span>
+                    Creating account...
                   </>
                 ) : (
                   <>
-                    <span>Request Access</span>
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    Create account
+                    <ArrowRight className="w-4.5 h-4.5" />
                   </>
                 )}
-              </div>
-            </button>
-          </form>
+              </button>
+            </form>
 
-          {/* Login Link Switcher */}
-          <p className="text-center text-sm text-zinc-400 pt-2">
-            Already have dealer credentials?{" "}
-            <Link
-              to="/login"
-              className="text-red-500 font-bold hover:text-red-400 transition-colors underline underline-offset-4"
-            >
-              Sign In
-            </Link>
-          </p>
-        </motion.div>
+            <p className="text-center text-sm text-zinc-400">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="text-red-500 font-semibold hover:text-red-400 transition-colors underline underline-offset-4"
+              >
+                Sign in
+              </Link>
+            </p>
+          </motion.div>
+        </div>
       </div>
     </motion.div>
   );
