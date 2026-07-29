@@ -14,19 +14,16 @@ const allowedOrigins = [
   "https://drivehub-inventory-system.vercel.app", // ← No trailing slash
 ];
 
-app.use(
-  cors({
-    origin(origin, callback) {
-      // Allow requests with no origin (Postman, curl, etc.)
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      callback(new Error("Not allowed by CORS"));
+app.use(cors({
+    origin: function(origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
     },
-    credentials: true,
-  })
-);
-
+    credentials: true
+}));
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
