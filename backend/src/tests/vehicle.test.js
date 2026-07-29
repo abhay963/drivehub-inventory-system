@@ -1,6 +1,6 @@
 import request from "supertest";
 import app from "../app.js";
-
+import User from "../models/User.js";
 import {
   connectTestDB,
   disconnectTestDB,
@@ -124,4 +124,49 @@ test("PUT /api/vehicles/:id should update vehicle details", async () => {
   expect(response.body.vehicle.year).toBe(2024);
   expect(response.body.vehicle.price).toBe(4500000);
   expect(response.body.vehicle.quantity).toBe(8);
+});
+
+
+
+
+test("DELETE /api/vehicles/:id should delete vehicle", async () => {
+  // Register Admin
+  await request(app).post("/api/auth/register").send({
+    name: "Admin",
+    email: "admin@test.com",
+    password: "123456",
+  });
+
+  // Make the registered user an admin
+  await User.findOneAndUpdate(
+    { email: "admin@test.com" },
+    { role: "admin" }
+  );
+
+  // Login
+  const loginResponse = await request(app).post("/api/auth/login").send({
+    email: "admin@test.com",
+    password: "123456",
+  });
+
+  const token = loginResponse.body.token;
+
+  // Create Vehicle
+const createResponse = await request(app).post("/api/vehicles").send({
+  brand: "Toyota",
+  model: "Fortuner",
+  category: "SUV",
+  year: 2023,
+  price: 4200000,
+  quantity: 5,
+});
+
+  const vehicleId = createResponse.body.vehicle._id;
+
+  // Delete Vehicle
+  const response = await request(app)
+    .delete(`/api/vehicles/${vehicleId}`)
+    .set("Authorization", `Bearer ${token}`);
+
+  expect(response.statusCode).toBe(200);
 });

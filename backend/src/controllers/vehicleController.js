@@ -1,5 +1,5 @@
 import Vehicle from "../models/Vehicle.js";
-
+import User from "../models/User.js";
 export const createVehicle = async (req, res) => {
   try {
     const { brand, model, category, year, price, quantity } = req.body;
@@ -90,5 +90,23 @@ export const updateVehicle = async (req, res) => {
 
 
 
+export const deleteVehicle = async (req, res) => {
+  try {
+    const vehicle = await Vehicle.findByIdAndDelete(req.params.id);
 
+    if (!vehicle) {
+      return res.status(404).json({
+        message: "Vehicle not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Vehicle deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
