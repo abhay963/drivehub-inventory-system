@@ -12,7 +12,7 @@ import {
   searchVehicles,
   purchaseVehicle,
   deleteVehicle,
-  restockVehicle,
+  restockVehicle, getPurchaseHistory
 } from "../controllers/vehicleController.js";
 
 const router = express.Router();
@@ -56,7 +56,7 @@ router.post(
   handleVehicleImageUpload,
   createVehicle
 );
-
+router.get("/purchases", protect, getPurchaseHistory);
 router.put(
   "/:id",
   protect,

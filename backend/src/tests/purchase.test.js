@@ -69,3 +69,33 @@ describe("Purchase Vehicle", () => {
     expect(purchase.totalPrice).toBe(vehicle.price);
   });
 });
+
+
+describe("GET /api/vehicles/purchases", () => {
+  test("should return purchase history of logged in user", async () => {
+    // Arrange
+    await request(app)
+      .post(`/api/vehicles/${vehicle._id}/purchase`)
+      .set("Authorization", `Bearer ${token}`);
+
+    // Act
+    const response = await request(app)
+      .get("/api/vehicles/purchases")
+      .set("Authorization", `Bearer ${token}`);
+
+    // Assert
+    expect(response.statusCode).toBe(200);
+
+    expect(Array.isArray(response.body)).toBe(true);
+
+    expect(response.body).toHaveLength(1);
+
+    expect(response.body[0].quantity).toBe(1);
+
+    expect(response.body[0].totalPrice).toBe(vehicle.price);
+
+    expect(response.body[0].vehicle.brand).toBe("Toyota");
+
+    expect(response.body[0].vehicle.model).toBe("Fortuner");
+  });
+});

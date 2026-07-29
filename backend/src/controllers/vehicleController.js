@@ -271,3 +271,22 @@ export const restockVehicle = async (req, res) => {
     });
   }
 };
+
+
+
+
+export const getPurchaseHistory = async (req, res) => {
+  try {
+    const purchases = await Purchase.find({
+      user: req.user.id,
+    })
+      .populate("vehicle")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(purchases);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};

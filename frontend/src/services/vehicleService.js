@@ -97,3 +97,10 @@ export const restockVehicle = async (id, quantity) => {
 
   return response.data;
 };
+
+
+
+export const getPurchaseHistory = async () => {
+  const response = await api.get("/vehicles/purchases");
+  return response.data;
+};
