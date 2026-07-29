@@ -85,3 +85,33 @@ test("should login user with valid credentials", async () => {
   expect(response.statusCode).toBe(200);
   expect(response.body).toHaveProperty("token");
 });
+
+
+
+
+test("should not login with wrong password", async () => {
+  await request(app).post("/api/auth/register").send({
+    name: "Abhay",
+    email: "wrong@test.com",
+    password: "123456",
+  });
+
+  const response = await request(app).post("/api/auth/login").send({
+    email: "wrong@test.com",
+    password: "abcdef",
+  });
+
+  expect(response.statusCode).toBe(400);
+});
+
+
+
+
+test("should not login if user does not exist", async () => {
+  const response = await request(app).post("/api/auth/login").send({
+    email: "nouser@test.com",
+    password: "123456",
+  });
+
+  expect(response.statusCode).toBe(400);
+});
