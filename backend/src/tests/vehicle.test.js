@@ -202,3 +202,41 @@ test("GET /api/vehicles/search should filter vehicles", async () => {
   expect(response.body.length).toBe(1);
   expect(response.body[0].brand).toBe("Toyota");
 });
+
+
+
+test("POST /api/vehicles/:id/purchase should purchase a vehicle", async () => {
+  // Register User
+  await request(app).post("/api/auth/register").send({
+    name: "Abhay",
+    email: "user@test.com",
+    password: "123456",
+  });
+
+  // Login
+  const loginResponse = await request(app).post("/api/auth/login").send({
+    email: "user@test.com",
+    password: "123456",
+  });
+
+  const token = loginResponse.body.token;
+
+const createResponse = await request(app).post("/api/vehicles").send({
+  brand: "Toyota",
+  model: "Fortuner",
+  category: "SUV",
+  year: 2023,
+  price: 4200000,
+  quantity: 5,
+});
+
+  const vehicleId = createResponse.body.vehicle._id;
+
+  // Purchase
+  const response = await request(app)
+    .post(`/api/vehicles/${vehicleId}/purchase`)
+    .set("Authorization", `Bearer ${token}`);
+
+  expect(response.statusCode).toBe(200);
+  expect(response.body.vehicle.quantity).toBe(4);
+});
