@@ -9,6 +9,7 @@ import zxcvbn from "zxcvbn";
 import {
   User,
   Mail,
+  Phone,
   Lock,
   Eye,
   EyeOff,
@@ -20,7 +21,8 @@ import {
   Gauge,
   ArrowLeft,
 } from "lucide-react";
-import { registerUser } from "../services/authService";
+import { sendOtp } from "../services/authService";
+import OtpModal from "../components/auth/OtpModal";
 
 const registerSchema = z
   .object({
@@ -31,6 +33,10 @@ const registerSchema = z
       .max(40, "Name cannot exceed 40 characters")
       .regex(/^[A-Za-z ]+$/, "Only letters and spaces are allowed"),
     email: z.string().trim().email("Please enter a valid email address"),
+    phone: z
+      .string()
+      .trim()
+      .regex(/^[0-9]{10}$/, "Please enter a valid 10-digit phone number"),
     password: z
       .string()
       .min(8, "Password must be at least 8 characters")
@@ -92,7 +98,10 @@ const Register = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const [userData, setUserData] = useState(null);
+  
   const {
     register,
     handleSubmit,
@@ -104,6 +113,7 @@ const Register = () => {
     defaultValues: {
       name: "",
       email: "",
+      phone: "",
       password: "",
       confirmPassword: "",
     },
@@ -112,6 +122,7 @@ const Register = () => {
   const passwordValue = watch("password") || "";
   const nameValue = watch("name");
   const emailValue = watch("email");
+  const phoneValue = watch("phone");
   const confirmValue = watch("confirmPassword");
 
   const strength = useMemo(() => {
@@ -125,6 +136,8 @@ const Register = () => {
     dirtyFields.name && !errors.name && nameValue?.length >= 3;
   const isEmailValid =
     dirtyFields.email && !errors.email && emailValue?.includes("@");
+  const isPhoneValid =
+    dirtyFields.phone && !errors.phone && phoneValue?.length === 10;
   const isPasswordValid =
     dirtyFields.password && !errors.password && passwordValue.length >= 8;
   const isConfirmValid =
@@ -138,15 +151,20 @@ const Register = () => {
       const payload = {
         name: data.name.trim(),
         email: data.email.trim().toLowerCase(),
+        phone: data.phone.trim(),
         password: data.password,
       };
 
-      await registerUser(payload);
-      toast.success("Account created successfully");
-      setTimeout(() => navigate("/login"), 1500);
+      await sendOtp(payload);
+
+      setUserEmail(payload.email);
+setUserData(payload);
+      toast.success("OTP sent to your email");
+
+      setShowOtpModal(true);
     } catch (err) {
       toast.error(
-        err.response?.data?.message || "Registration failed. Please try again."
+        err.response?.data?.message || "Failed to send OTP"
       );
     }
   };
@@ -327,6 +345,45 @@ const Register = () => {
                 </AnimatePresence>
               </div>
 
+              {/* Phone */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Phone Number
+                </label>
+                <div className="relative group">
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-500 group-focus-within:text-red-500 transition-colors pointer-events-none" />
+                  <input
+                    type="tel"
+                    placeholder="9876543210"
+                    {...register("phone")}
+                    className={`w-full bg-zinc-900/90 border rounded-xl px-11 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-4 transition-all ${
+                      errors.phone
+                        ? "border-red-500/70 focus:border-red-500 focus:ring-red-600/20"
+                        : isPhoneValid
+                        ? "border-emerald-500/60 focus:border-emerald-500 focus:ring-emerald-600/20"
+                        : "border-zinc-800 focus:border-red-600 focus:ring-red-600/20"
+                    }`}
+                  />
+                  {isPhoneValid && (
+                    <CheckCircle2 className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-emerald-400" />
+                  )}
+                </div>
+                <AnimatePresence mode="wait">
+                  {errors.phone && (
+                    <motion.p
+                      variants={errorVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      className="text-xs text-red-500 font-medium pl-1 flex items-center gap-1"
+                    >
+                      <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
+                      {errors.phone.message}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </div>
+
               {/* Password */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">
@@ -468,6 +525,14 @@ const Register = () => {
                 )}
               </button>
             </form>
+
+            {showOtpModal && (
+             <OtpModal
+  email={userEmail}
+  userData={userData}
+  onClose={() => setShowOtpModal(false)}
+/>
+            )}
 
             <p className="text-center text-sm text-zinc-400">
               Already have an account?{" "}
