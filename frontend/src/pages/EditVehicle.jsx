@@ -12,6 +12,9 @@ import {
   ArrowLeft,
   Save,
   AlertCircle,
+  Upload,
+  X,
+  ImageOff,
 } from "lucide-react";
 import Layout from "../components/layout/Layout";
 import {
@@ -51,8 +54,11 @@ const EditVehicle = () => {
     year: "",
     price: "",
     quantity: "",
+    image: null,
   });
 
+  const [imagePreview, setImagePreview] = useState("");
+  const [savedImage, setSavedImage] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -65,15 +71,19 @@ const EditVehicle = () => {
   const fetchVehicle = async () => {
     try {
       const data = await getVehicleById(id);
+      const vehicle = data.vehicle ?? data;
 
       setFormData({
-        brand: data.vehicle.brand ?? "",
-        model: data.vehicle.model ?? "",
-        category: data.vehicle.category ?? "",
-        year: data.vehicle.year ?? "",
-        price: data.vehicle.price ?? "",
-        quantity: data.vehicle.quantity ?? "",
+        brand: vehicle.brand ?? "",
+        model: vehicle.model ?? "",
+        category: vehicle.category ?? "",
+        year: vehicle.year ?? "",
+        price: vehicle.price ?? "",
+        quantity: vehicle.quantity ?? "",
+        image: null,
       });
+      setImagePreview(vehicle.image ?? "");
+      setSavedImage(vehicle.image ?? "");
     } catch (err) {
       setError("Failed to load vehicle.");
     } finally {
@@ -87,6 +97,26 @@ const EditVehicle = () => {
       [e.target.name]: e.target.value,
     }));
     setError("");
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setFormData((prev) => ({
+      ...prev,
+      image: file,
+    }));
+    setImagePreview(URL.createObjectURL(file));
+    setError("");
+  };
+
+  const removeImage = () => {
+    setFormData((prev) => ({
+      ...prev,
+      image: null,
+    }));
+    setImagePreview(savedImage);
   };
 
   const handleSubmit = async (e) => {
@@ -340,6 +370,67 @@ const EditVehicle = () => {
                   onChange={handleChange}
                   required
                   className={fieldClass}
+                />
+              </div>
+            </div>
+
+            {/* Vehicle Image */}
+            <div>
+              <label
+                htmlFor="vehicle-image-upload"
+                className="block text-[12px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5"
+              >
+                Vehicle Image
+              </label>
+              <div className="relative">
+                {imagePreview ? (
+                  <div className="relative w-full h-48 rounded-xl border border-zinc-800 bg-zinc-950 overflow-hidden flex items-center justify-center">
+                    <img
+                      src={imagePreview}
+                      alt="Vehicle Preview"
+                      className="w-full h-full object-cover"
+                    />
+                    {formData.image && (
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute top-3 right-3 p-1.5 rounded-lg bg-zinc-900/80 border border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all"
+                        title="Reset image"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <label
+                    htmlFor="vehicle-image-upload"
+                    className="flex flex-col items-center justify-center w-full h-40 rounded-xl border border-dashed border-zinc-800 bg-zinc-950/60 hover:border-zinc-700 hover:bg-zinc-950 cursor-pointer transition-all group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-2 group-hover:scale-105 transition-transform">
+                      <ImageOff className="w-5 h-5" />
+                    </div>
+                    <p className="text-sm font-medium text-zinc-400 group-hover:text-zinc-300 transition-colors">
+                      No vehicle image selected
+                    </p>
+                    <p className="text-xs text-zinc-600 mt-1">
+                      PNG, JPG or WEBP (up to 5MB)
+                    </p>
+                  </label>
+                )}
+
+                <label
+                  htmlFor="vehicle-image-upload"
+                  className="mt-3 inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-800 bg-zinc-950/40 px-4 py-2.5 text-[13px] font-medium text-zinc-300 hover:text-white hover:border-zinc-700 cursor-pointer transition-all"
+                >
+                  <Upload className="w-4 h-4" />
+                  {imagePreview ? "Replace image" : "Upload image"}
+                </label>
+                <input
+                  id="vehicle-image-upload"
+                  type="file"
+                  accept="image/png,image/jpeg,image/jpg,image/webp"
+                  onChange={handleImageChange}
+                  className="hidden"
                 />
               </div>
             </div>

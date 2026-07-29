@@ -240,18 +240,29 @@ export const restockVehicle = async (req, res) => {
       });
     }
 
-    if (!quantity || quantity <= 0) {
+    const change = Number(quantity);
+
+    if (!Number.isInteger(change) || change === 0) {
       return res.status(400).json({
-        message: "Quantity must be greater than 0",
+        message: "Quantity must be a non-zero integer",
       });
     }
 
-    vehicle.quantity += quantity;
+    if (vehicle.quantity + change < 0) {
+      return res.status(400).json({
+        message: "Insufficient stock. Cannot reduce below 0.",
+      });
+    }
+
+    vehicle.quantity += change;
 
     await vehicle.save();
 
     res.status(200).json({
-      message: "Vehicle restocked successfully",
+      message:
+        change > 0
+          ? "Vehicle restocked successfully"
+          : "Vehicle stock reduced successfully",
       vehicle,
     });
   } catch (error) {

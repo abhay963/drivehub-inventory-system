@@ -14,6 +14,7 @@ import {
   AlertCircle,
   X,
   ImageOff,
+  Minus,
 } from "lucide-react";
 import Layout from "../components/layout/Layout";
 import {
@@ -53,8 +54,8 @@ const Inventory = () => {
   const [restockTarget, setRestockTarget] = useState(null);
   const [restockQuantity, setRestockQuantity] = useState("");
   const [restockError, setRestockError] = useState("");
+  const [stockMode, setStockMode] = useState("increase"); // "increase" | "decrease"
 
-  // Role check based on localStorage user object
   const user = JSON.parse(localStorage.getItem("user"));
   const isAdmin = user?.role === "admin";
 
@@ -139,6 +140,7 @@ const Inventory = () => {
     setRestockTarget(vehicle);
     setRestockQuantity("");
     setRestockError("");
+    setStockMode("increase");
   };
 
   const closeRestockDialog = () => {
@@ -146,22 +148,50 @@ const Inventory = () => {
     setRestockTarget(null);
     setRestockQuantity("");
     setRestockError("");
+    setStockMode("increase");
   };
+
+  const qtyNum =
+    restockQuantity === "" ? null : Number(restockQuantity);
+
+  const isValidQty =
+    qtyNum !== null && Number.isInteger(qtyNum) && qtyNum > 0;
+
+  const signedDelta = isValidQty
+    ? stockMode === "increase"
+      ? qtyNum
+      : -qtyNum
+    : 0;
+
+  const updatedStock = restockTarget
+    ? Number(restockTarget.quantity || 0) + signedDelta
+    : 0;
+
+  const wouldBeNegative =
+    isValidQty && stockMode === "decrease" && updatedStock < 0;
+
+  const canSubmit =
+    isValidQty &&
+    !wouldBeNegative &&
+    actionId !== restockTarget?._id;
 
   const handleRestockSubmit = async (e) => {
     e.preventDefault();
 
-    const quantity = Number(restockQuantity);
+    if (!isValidQty) {
+      setRestockError("Enter a positive whole number.");
+      return;
+    }
 
-    if (!Number.isInteger(quantity) || quantity <= 0) {
-      setRestockError("Enter a whole number greater than 0.");
+    if (wouldBeNegative) {
+      setRestockError("Insufficient stock. Cannot reduce below 0.");
       return;
     }
 
     try {
       setActionId(restockTarget._id);
       setRestockError("");
-      const data = await restockVehicle(restockTarget._id, quantity);
+      const data = await restockVehicle(restockTarget._id, signedDelta);
       setVehicles((prev) =>
         prev.map((v) => (v._id === restockTarget._id ? data.vehicle : v))
       );
@@ -170,8 +200,9 @@ const Inventory = () => {
       );
       setRestockTarget(null);
       setRestockQuantity("");
+      setStockMode("increase");
     } catch (err) {
-      setRestockError(err.response?.data?.message || "Restock failed");
+      setRestockError(err.response?.data?.message || "Stock update failed");
     } finally {
       setActionId(null);
     }
@@ -436,6 +467,7 @@ const Inventory = () => {
           </div>
         )}
 
+        {/* Vehicle detail modal */}
         <AnimatePresence>
           {selectedVehicle && (
             <motion.div
@@ -581,6 +613,7 @@ const Inventory = () => {
           )}
         </AnimatePresence>
 
+        {/* Update Stock modal */}
         <AnimatePresence>
           {restockTarget && (
             <motion.div
@@ -599,6 +632,7 @@ const Inventory = () => {
                 onClick={(e) => e.stopPropagation()}
                 className="w-full max-w-md overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl"
               >
+                {/* Header */}
                 <div className="flex items-start justify-between gap-4 border-b border-zinc-800 p-5">
                   <div className="flex items-start gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-violet-500/25 bg-violet-500/10 text-violet-400">
@@ -606,7 +640,7 @@ const Inventory = () => {
                     </div>
                     <div>
                       <h2 className="text-lg font-bold text-white">
-                        Restock Vehicle
+                        Update Stock
                       </h2>
                       <p className="mt-1 text-sm text-zinc-500">
                         {restockTarget.brand} {restockTarget.model}
@@ -626,6 +660,7 @@ const Inventory = () => {
                 </div>
 
                 <div className="space-y-4 p-5">
+                  {/* Current / Updated preview */}
                   <div className="grid grid-cols-2 gap-3">
                     <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
                       <p className="text-[11px] uppercase tracking-wider text-zinc-500">
@@ -635,23 +670,76 @@ const Inventory = () => {
                         {restockTarget.quantity}
                       </p>
                     </div>
-                    <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
-                      <p className="text-[11px] uppercase tracking-wider text-zinc-500">
-                        After Restock
+                    <div
+                      className={`rounded-xl border p-4 ${
+                        wouldBeNegative
+                          ? "border-rose-500/40 bg-rose-500/10"
+                          : "border-zinc-800 bg-zinc-900/70"
+                      }`}
+                    >
+                      <p
+                        className={`text-[11px] uppercase tracking-wider ${
+                          wouldBeNegative ? "text-rose-400" : "text-zinc-500"
+                        }`}
+                      >
+                        Updated Stock
                       </p>
-                      <p className="mt-1 text-xl font-bold text-white">
-                        {Number(restockTarget.quantity || 0) +
-                          Number(restockQuantity || 0)}
+                      <p
+                        className={`mt-1 text-xl font-bold ${
+                          wouldBeNegative ? "text-rose-400" : "text-white"
+                        }`}
+                      >
+                        {isValidQty ? updatedStock : restockTarget.quantity}
                       </p>
                     </div>
                   </div>
 
+                  {/* + / − mode buttons */}
+                  <div>
+                    <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wider text-zinc-500">
+                      Action
+                    </p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setStockMode("increase");
+                          setRestockError("");
+                        }}
+                        className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-semibold transition-all ${
+                          stockMode === "increase"
+                            ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-400"
+                            : "border-zinc-800 bg-zinc-900/50 text-zinc-400 hover:text-white hover:border-zinc-700"
+                        }`}
+                      >
+                        <Plus className="w-4 h-4" />
+                        Increase
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setStockMode("decrease");
+                          setRestockError("");
+                        }}
+                        className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-semibold transition-all ${
+                          stockMode === "decrease"
+                            ? "border-rose-500/40 bg-rose-500/15 text-rose-400"
+                            : "border-zinc-800 bg-zinc-900/50 text-zinc-400 hover:text-white hover:border-zinc-700"
+                        }`}
+                      >
+                        <Minus className="w-4 h-4" />
+                        Decrease
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Quantity input */}
                   <div>
                     <label
                       htmlFor="restock-quantity"
                       className="mb-1.5 block text-[12px] font-semibold uppercase tracking-wider text-zinc-500"
                     >
-                      Quantity to Add
+                      Quantity
                     </label>
                     <input
                       id="restock-quantity"
@@ -664,13 +752,22 @@ const Inventory = () => {
                         setRestockError("");
                       }}
                       autoFocus
-                      className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-[14px] text-white outline-none transition-all placeholder:text-zinc-600 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/15"
+                      className={`w-full rounded-xl border bg-zinc-950 px-4 py-3 text-[14px] text-white outline-none transition-all placeholder:text-zinc-600 focus:ring-2 ${
+                        wouldBeNegative
+                          ? "border-rose-500/50 focus:border-rose-500/50 focus:ring-rose-500/15"
+                          : "border-zinc-800 focus:border-violet-500/50 focus:ring-violet-500/15"
+                      }`}
                       placeholder="e.g. 5"
                     />
+                    <p className="mt-2 text-[12px] text-zinc-500">
+                      {stockMode === "increase"
+                        ? "This amount will be added to current stock."
+                        : "This amount will be removed from current stock."}
+                    </p>
                   </div>
 
                   <AnimatePresence>
-                    {restockError && (
+                    {(restockError || wouldBeNegative) && (
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
@@ -678,12 +775,14 @@ const Inventory = () => {
                         className="flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300"
                       >
                         <AlertCircle className="w-4 h-4 shrink-0" />
-                        {restockError}
+                        {restockError ||
+                          "Insufficient stock. Cannot reduce below 0."}
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
 
+                {/* Footer */}
                 <div className="flex flex-col-reverse gap-2 border-t border-zinc-800 p-5 sm:flex-row sm:justify-end">
                   <button
                     type="button"
@@ -695,8 +794,8 @@ const Inventory = () => {
                   </button>
                   <button
                     type="submit"
-                    disabled={actionId === restockTarget._id}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-600/20 transition-all hover:bg-violet-500 disabled:opacity-50"
+                    disabled={!canSubmit}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-600/20 transition-all hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {actionId === restockTarget._id ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
