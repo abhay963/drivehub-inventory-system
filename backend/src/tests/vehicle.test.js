@@ -69,3 +69,25 @@ test("GET /api/vehicles should return all vehicles", async () => {
   expect(response.statusCode).toBe(200);
   expect(response.body.length).toBe(2);
 });
+
+
+
+
+test("GET /api/vehicles/:id should return a single vehicle", async () => {
+  const createResponse = await request(app).post("/api/vehicles").send({
+    brand: "Toyota",
+    model: "Fortuner",
+    category: "SUV",
+    year: 2023,
+    price: 4200000,
+    quantity: 5,
+  });
+
+  const vehicleId = createResponse.body.vehicle._id;
+
+  const response = await request(app).get(`/api/vehicles/${vehicleId}`);
+
+  expect(response.statusCode).toBe(200);
+  expect(response.body.brand).toBe("Toyota");
+  expect(response.body.model).toBe("Fortuner");
+});
