@@ -91,3 +91,37 @@ test("GET /api/vehicles/:id should return a single vehicle", async () => {
   expect(response.body.brand).toBe("Toyota");
   expect(response.body.model).toBe("Fortuner");
 });
+
+
+
+
+test("PUT /api/vehicles/:id should update vehicle details", async () => {
+  const createResponse = await request(app).post("/api/vehicles").send({
+    brand: "Toyota",
+    model: "Fortuner",
+    category: "SUV",
+    year: 2023,
+    price: 4200000,
+    quantity: 5,
+  });
+
+  const vehicleId = createResponse.body.vehicle._id;
+
+  const response = await request(app)
+    .put(`/api/vehicles/${vehicleId}`)
+    .send({
+      brand: "Toyota",
+      model: "Fortuner Legender",
+      category: "SUV",
+      year: 2024,
+      price: 4500000,
+      quantity: 8,
+    });
+
+  expect(response.statusCode).toBe(200);
+  expect(response.body.vehicle.model).toBe("Fortuner Legender");
+  expect(response.body.vehicle.category).toBe("SUV");
+  expect(response.body.vehicle.year).toBe(2024);
+  expect(response.body.vehicle.price).toBe(4500000);
+  expect(response.body.vehicle.quantity).toBe(8);
+});
