@@ -41,3 +41,31 @@ describe("Vehicle API", () => {
     expect(response.statusCode).toBe(201);
   });
 });
+
+
+
+
+test("GET /api/vehicles should return all vehicles", async () => {
+  await request(app).post("/api/vehicles").send({
+    brand: "Toyota",
+    model: "Fortuner",
+    category: "SUV",
+    year: 2023,
+    price: 4200000,
+    quantity: 5,
+  });
+
+  await request(app).post("/api/vehicles").send({
+    brand: "Honda",
+    model: "City",
+    category: "Sedan",
+    year: 2022,
+    price: 1500000,
+    quantity: 3,
+  });
+
+  const response = await request(app).get("/api/vehicles");
+
+  expect(response.statusCode).toBe(200);
+  expect(response.body.length).toBe(2);
+});
