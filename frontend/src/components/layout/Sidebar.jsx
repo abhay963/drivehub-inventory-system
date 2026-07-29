@@ -5,13 +5,20 @@ import {
   PlusCircle,
 } from "lucide-react";
 
-const links = [
+const allLinks = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/inventory", label: "Inventory", icon: Package },
-  { to: "/add-vehicle", label: "Add Vehicle", icon: PlusCircle },
+  { to: "/add-vehicle", label: "Add Vehicle", icon: PlusCircle, adminOnly: true },
 ];
 
 const Sidebar = () => {
+  // Role check based on localStorage user object
+  const user = JSON.parse(localStorage.getItem("user"));
+  const isAdmin = user?.role === "admin";
+
+  // Filter links based on user role
+  const links = allLinks.filter((link) => !link.adminOnly || isAdmin);
+
   return (
     <aside className="hidden md:flex w-56 shrink-0 flex-col border-r border-zinc-800/80 bg-zinc-950 min-h-[calc(100vh-4rem)] py-6 px-3">
       <p className="px-3 mb-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-600">

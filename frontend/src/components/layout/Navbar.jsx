@@ -63,6 +63,7 @@ const Navbar = () => {
   const { logout } = auth;
 
   const user = resolveUser(auth.user);
+  const isAdmin = user.role === "admin";
 
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -127,10 +128,12 @@ const Navbar = () => {
             <Package className="w-3.5 h-3.5" />
             Inventory
           </NavLink>
-          <NavLink to="/add-vehicle" className={navLinkClass}>
-            <PlusCircle className="w-3.5 h-3.5" />
-            Add Vehicle
-          </NavLink>
+          {isAdmin && (
+            <NavLink to="/add-vehicle" className={navLinkClass}>
+              <PlusCircle className="w-3.5 h-3.5" />
+              Add Vehicle
+            </NavLink>
+          )}
         </div>
       </div>
 
@@ -218,15 +221,17 @@ const Navbar = () => {
                 <Package className="w-4 h-4 text-zinc-500" />
                 Inventory
               </Link>
-              <Link
-                to="/add-vehicle"
-                role="menuitem"
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-2.5 px-4 py-2.5 text-[13px] text-zinc-300 hover:bg-white/[0.04] hover:text-white transition-colors"
-              >
-                <PlusCircle className="w-4 h-4 text-zinc-500" />
-                Add Vehicle
-              </Link>
+              {isAdmin && (
+                <Link
+                  to="/add-vehicle"
+                  role="menuitem"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-2.5 text-[13px] text-zinc-300 hover:bg-white/[0.04] hover:text-white transition-colors"
+                >
+                  <PlusCircle className="w-4 h-4 text-zinc-500" />
+                  Add Vehicle
+                </Link>
+              )}
             </div>
 
             <div className="py-1.5">

@@ -48,6 +48,10 @@ const Inventory = () => {
   const [actionId, setActionId] = useState(null);
   const [error, setError] = useState("");
 
+  // Role check based on localStorage user object
+  const user = JSON.parse(localStorage.getItem("user"));
+  const isAdmin = user?.role === "admin";
+
   useEffect(() => {
     fetchVehicles();
   }, []);
@@ -161,13 +165,15 @@ const Inventory = () => {
             </p>
           </div>
 
-          <Link
-            to="/add-vehicle"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold px-5 py-2.5 text-[13.5px] shadow-lg shadow-red-600/25 transition-all active:scale-[0.98]"
-          >
-            <Plus className="w-4 h-4" />
-            Add Vehicle
-          </Link>
+          {isAdmin && (
+            <Link
+              to="/add-vehicle"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold px-5 py-2.5 text-[13.5px] shadow-lg shadow-red-600/25 transition-all active:scale-[0.98]"
+            >
+              <Plus className="w-4 h-4" />
+              Add Vehicle
+            </Link>
+          )}
         </div>
 
         {/* Search bar */}
@@ -295,22 +301,26 @@ const Inventory = () => {
                           </td>
                           <td className="px-4 py-4">
                             <div className="flex flex-wrap items-center gap-1.5">
-                              <Link
-                                to={`/edit-vehicle/${vehicle._id}`}
-                                className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700/60 bg-zinc-800/40 px-2.5 py-1.5 text-[12px] font-medium text-zinc-300 hover:text-white hover:border-zinc-600 transition-all"
-                              >
-                                <Pencil className="w-3.5 h-3.5" />
-                                Edit
-                              </Link>
+                              {isAdmin && (
+                                <Link
+                                  to={`/edit-vehicle/${vehicle._id}`}
+                                  className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700/60 bg-zinc-800/40 px-2.5 py-1.5 text-[12px] font-medium text-zinc-300 hover:text-white hover:border-zinc-600 transition-all"
+                                >
+                                  <Pencil className="w-3.5 h-3.5" />
+                                  Edit
+                                </Link>
+                              )}
 
-                              <button
-                                onClick={() => handleDelete(vehicle._id)}
-                                disabled={busy}
-                                className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/25 bg-rose-500/10 px-2.5 py-1.5 text-[12px] font-medium text-rose-400 hover:bg-rose-500/20 transition-all disabled:opacity-50"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                                Delete
-                              </button>
+                              {isAdmin && (
+                                <button
+                                  onClick={() => handleDelete(vehicle._id)}
+                                  disabled={busy}
+                                  className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/25 bg-rose-500/10 px-2.5 py-1.5 text-[12px] font-medium text-rose-400 hover:bg-rose-500/20 transition-all disabled:opacity-50"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                  Delete
+                                </button>
+                              )}
 
                               <button
                                 onClick={() => handlePurchase(vehicle._id)}
@@ -331,14 +341,16 @@ const Inventory = () => {
                                   : "Purchase"}
                               </button>
 
-                              <button
-                                onClick={() => handleRestock(vehicle._id)}
-                                disabled={busy}
-                                className="inline-flex items-center gap-1.5 rounded-lg border border-violet-500/25 bg-violet-500/10 px-2.5 py-1.5 text-[12px] font-medium text-violet-400 hover:bg-violet-500/20 transition-all disabled:opacity-50"
-                              >
-                                <PackagePlus className="w-3.5 h-3.5" />
-                                Restock
-                              </button>
+                              {isAdmin && (
+                                <button
+                                  onClick={() => handleRestock(vehicle._id)}
+                                  disabled={busy}
+                                  className="inline-flex items-center gap-1.5 rounded-lg border border-violet-500/25 bg-violet-500/10 px-2.5 py-1.5 text-[12px] font-medium text-violet-400 hover:bg-violet-500/20 transition-all disabled:opacity-50"
+                                >
+                                  <PackagePlus className="w-3.5 h-3.5" />
+                                  Restock
+                                </button>
+                              )}
                             </div>
                           </td>
                         </tr>

@@ -10,12 +10,17 @@ const router = express.Router();
 router.get("/search", searchVehicles);
 router.get("/summary", getInventorySummary);
 
-router.get("/", getAllVehicles);
-router.post("/", createVehicle);
+router.get("/", protect, getAllVehicles);
+
+router.post("/", protect, admin, createVehicle);
 
 router.get("/:id", getVehicleById);
-router.put("/:id", updateVehicle);
+
+router.put("/:id", protect, admin, updateVehicle);
+
 router.delete("/:id", protect, admin, deleteVehicle);
+
 router.post("/:id/purchase", protect, purchaseVehicle);
 
+router.post("/:id/restock", protect, admin, restockVehicle);
 export default router;
