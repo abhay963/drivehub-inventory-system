@@ -23,7 +23,7 @@ export const createVehicle = async (req, res) => {
     });
   }
 };
-
+import Purchase from "../models/Purchase.js";
 
 
 
@@ -156,9 +156,17 @@ export const purchaseVehicle = async (req, res) => {
 
     await vehicle.save();
 
+    const purchase = await Purchase.create({
+      user: req.user.id,
+      vehicle: vehicle._id,
+      quantity: 1,
+      totalPrice: vehicle.price,
+    });
+
     res.status(200).json({
       message: "Vehicle purchased successfully",
       vehicle,
+      purchase,
     });
   } catch (error) {
     res.status(500).json({

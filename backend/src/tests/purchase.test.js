@@ -4,6 +4,7 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 import app from "../app.js";
 import Vehicle from "../models/Vehicle.js";
 import User from "../models/User.js";
+import Purchase from "../models/Purchase.js";
 import jwt from "jsonwebtoken";
 
 let mongo;
@@ -55,7 +56,16 @@ describe("Purchase Vehicle", () => {
 
     expect(response.statusCode).toBe(200);
 
-    // This will fail because Purchase model doesn't exist yet
-    // We'll implement it next.
+    const purchase = await Purchase.findOne({
+      user: user._id,
+    });
+
+    expect(purchase).not.toBeNull();
+
+    expect(purchase.vehicle.toString()).toBe(vehicle._id.toString());
+
+    expect(purchase.quantity).toBe(1);
+
+    expect(purchase.totalPrice).toBe(vehicle.price);
   });
 });
