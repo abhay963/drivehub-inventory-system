@@ -19,14 +19,13 @@ import {
   CheckCircle2,
   BarChart3,
   Clock,
-  Database,
-  KeyRound,
   ShoppingCart,
   RefreshCw,
   Star,
   Phone,
   Mail,
   ChevronRight,
+  KeyRound,
 } from "lucide-react";
 
 /* -------------------------------------------------------------------------- */
@@ -73,81 +72,81 @@ const NAV_LINKS = [
 const FEATURES = [
   {
     icon: Shield,
-    title: "JWT Secured Clearance",
-    desc: "Token-based auth and role checks protect add, update, delete, and restock routes so only verified dealers act on inventory.",
+    title: "Secure Access",
+    desc: "Only authorized team members can add, update, or remove vehicles. Your inventory stays protected at every step.",
   },
   {
     icon: Search,
-    title: "Search & Filter",
-    desc: "Query the catalog by brand, model, category, or price so the sales floor finds stock before the customer finishes speaking.",
+    title: "Instant Search",
+    desc: "Find any vehicle by brand, model, category, or price in seconds — so your sales team never keeps a customer waiting.",
   },
   {
     icon: ShoppingCart,
-    title: "Purchase Flow",
-    desc: "One-click purchase decreases quantity. Buttons disable automatically when a unit hits zero stock.",
+    title: "Seamless Sales",
+    desc: "Mark a unit as sold with one click. Stock levels update automatically so everyone works with live numbers.",
   },
   {
     icon: RefreshCw,
-    title: "Admin Restock",
-    desc: "Authorized users restock any SKU, update pricing, and keep the lot synchronized with the live database.",
+    title: "Easy Restocking",
+    desc: "Add new arrivals or replenish existing models in moments. Keep every rooftop accurately stocked.",
   },
   {
-    icon: Database,
-    title: "Persistent Inventory",
-    desc: "Every vehicle is stored with unique ID, make, model, category, price, and quantity — not an in-memory demo.",
+    icon: Package,
+    title: "Complete Records",
+    desc: "Every vehicle is tracked with make, model, category, price, and quantity — a single source of truth for the entire lot.",
   },
   {
     icon: BarChart3,
-    title: "Live Dashboard",
-    desc: "At-a-glance totals for models, units on hand, and inventory valuation so managers start the day with clarity.",
+    title: "Clear Overview",
+    desc: "See total models, units on hand, and overall inventory value at a glance. Start every day with full clarity.",
   },
 ];
 
 const STEPS = [
   {
     step: "01",
-    title: "Register & authenticate",
-    desc: "Create an account and receive a JWT. Protected vehicle routes require a valid token on every request.",
+    title: "Create your account",
+    desc: "Sign up in minutes and give your team secure access to the platform.",
   },
   {
     step: "02",
-    title: "Catalog the lot",
-    desc: "Admins add vehicles with brand, model, category, year, price, and quantity. Updates and deletes stay role-gated.",
+    title: "Build your catalog",
+    desc: "Add vehicles with brand, model, category, year, price, and quantity. Edit or remove anytime.",
   },
   {
     step: "03",
-    title: "Search, sell, restock",
-    desc: "Dealers search the fleet, purchase units (quantity decreases), and restock when new inventory arrives.",
+    title: "Sell & restock with ease",
+    desc: "Search the fleet, close deals, and restock when new inventory arrives — all in one place.",
   },
 ];
 
 const STATS = [
   { value: "5,200+", label: "Vehicles tracked", icon: Car },
   { value: "120+", label: "Active dealerships", icon: Users },
-  { value: "99.9%", label: "API uptime target", icon: Gauge },
-  { value: "<50ms", label: "Search response", icon: Zap },
-  { value: "24/7", label: "Inventory sync", icon: Clock },
-  { value: "AES/JWT", label: "Secure sessions", icon: KeyRound },
+  { value: "99.9%", label: "Platform reliability", icon: Gauge },
+  { value: "Instant", label: "Search results", icon: Zap },
+  { value: "24/7", label: "Always in sync", icon: Clock },
+  { value: "Secure", label: "Protected access", icon: KeyRound },
 ];
 
 const LOCATIONS = [
   {
-    name: "RevMotors Flagship — Mumbai",
+    name: "DriveHub Flagship — Mumbai",
     coords: [19.076, 72.8777],
     detail: "Primary inventory hub · 180+ units",
   },
   {
-    name: "RevMotors — Bengaluru",
+    name: "DriveHub — Bengaluru",
     coords: [12.9716, 77.5946],
     detail: "South region allocation · 95 units",
   },
   {
-    name: "RevMotors — Delhi NCR",
+    name: "DriveHub — Delhi NCR",
     coords: [28.6139, 77.209],
     detail: "North operations · 140 units",
   },
   {
-    name: "RevMotors — Hyderabad",
+    name: "DriveHub — Hyderabad",
     coords: [17.385, 78.4867],
     detail: "EV & luxury focus · 70 units",
   },
@@ -156,19 +155,19 @@ const LOCATIONS = [
 const TESTIMONIALS = [
   {
     quote:
-      "Purchase and restock finally live in one system. Our floor team stopped chasing spreadsheets the first week.",
+      "Sales and restocking finally live in one system. Our floor team stopped chasing spreadsheets the first week.",
     name: "Ananya Rao",
     role: "GM, Apex Auto Group",
   },
   {
     quote:
-      "JWT-locked admin tools mean only the right people can delete or restock. That alone was worth the switch.",
+      "Only the right people can update or remove inventory. That peace of mind alone was worth the switch.",
     name: "Vikram Shah",
     role: "Operations, Sterling Motors",
   },
   {
     quote:
-      "Search by category and price is instant. Customers see what’s actually on the lot, not last week’s export.",
+      "Finding cars by category and price is instant. Customers see what’s actually on the lot, not last week’s list.",
     name: "Meera Kapoor",
     role: "Sales Lead, Velocity Cars",
   },
@@ -260,7 +259,7 @@ const Landing = () => {
               <Flame className="w-5 h-5" />
             </div>
             <span className="text-lg font-black tracking-widest uppercase bg-gradient-to-r from-white via-zinc-200 to-red-500 bg-clip-text text-transparent">
-              RevMotors
+              DriveHub
             </span>
           </Link>
 
@@ -287,7 +286,7 @@ const Landing = () => {
               to="/register"
               className="inline-flex items-center gap-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-semibold px-4 py-2.5 shadow-lg shadow-red-600/25 transition-all"
             >
-              Request Access
+              Get Started
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -327,7 +326,7 @@ const Landing = () => {
                 onClick={() => setMobileOpen(false)}
                 className="text-center py-2.5 rounded-xl bg-red-600 text-white text-sm font-semibold"
               >
-                Request Access
+                Get Started
               </Link>
             </div>
           </div>
@@ -347,7 +346,7 @@ const Landing = () => {
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-600/10 border border-red-500/30 text-red-400 text-xs font-bold tracking-wider uppercase"
           >
             <Zap className="w-3.5 h-3.5" />
-            Full-stack dealership inventory · JWT secured
+            Premium dealership inventory
           </motion.div>
 
           <motion.h1
@@ -356,7 +355,7 @@ const Landing = () => {
           >
             Command Your{" "}
             <span className="bg-gradient-to-r from-red-500 via-rose-500 to-orange-500 bg-clip-text text-transparent">
-              Exotic Inventory
+              Entire Inventory
             </span>{" "}
             With Precision.
           </motion.h1>
@@ -365,10 +364,9 @@ const Landing = () => {
             variants={fadeInUp}
             className="text-base sm:text-lg text-zinc-400 max-w-xl leading-relaxed"
           >
-            RevMotors is a complete car dealership inventory system: register,
-            authenticate with JWT, catalog vehicles, search the fleet, purchase
-            units, and restock — all from one modern SPA backed by a real
-            database API.
+            DriveHub gives dealerships a clear, modern way to manage every vehicle
+            on the lot — search, sell, restock, and stay in control from one
+            elegant platform.
           </motion.p>
 
           <motion.div
@@ -404,8 +402,8 @@ const Landing = () => {
           >
             {[
               ["$450M+", "Fleet value managed"],
-              ["99.9%", "Uptime SLA"],
-              ["JWT", "Protected APIs"],
+              ["99.9%", "Reliability"],
+              ["Secure", "Team access"],
             ].map(([value, label]) => (
               <div key={label}>
                 <p className="text-2xl sm:text-3xl font-black text-white">
@@ -458,12 +456,12 @@ const Landing = () => {
       {/* ── Logo / trust strip ───────────────────────────────────────────── */}
       <section className="border-y border-zinc-900 py-8 px-6">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-600">
-          <span>REST API</span>
-          <span>JWT Auth</span>
-          <span>MongoDB / SQL</span>
-          <span>React + Tailwind</span>
-          <span>TDD Ready</span>
-          <span>Role-based access</span>
+          <span>Live Inventory</span>
+          <span>Secure Access</span>
+          <span>Multi-Location</span>
+          <span>Instant Search</span>
+          <span>Sales Ready</span>
+          <span>Always Synced</span>
         </div>
       </section>
 
@@ -475,11 +473,10 @@ const Landing = () => {
               By the numbers
             </p>
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              Built to scale with the lot
+              Built to scale with your lot
             </h2>
             <p className="mt-3 text-sm text-zinc-400">
-              Metrics that matter for a production dealership inventory system —
-              not a toy demo.
+              Real results for dealerships that demand accuracy, speed, and control.
             </p>
           </div>
 
@@ -526,14 +523,14 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto space-y-14">
           <div className="text-center max-w-2xl mx-auto">
             <p className="text-xs font-bold uppercase tracking-widest text-red-500 mb-3">
-              Core architecture
+              Core capabilities
             </p>
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              Everything the assignment demands — and a real product feel
+              Everything your dealership needs — refined and ready
             </h2>
             <p className="mt-3 text-sm text-zinc-400">
-              Auth, protected vehicle CRUD, search, purchase, restock, and an
-              admin-ready UI on top of a persistent database.
+              Secure access, powerful search, effortless sales, and clear oversight
+              in one premium experience.
             </p>
           </div>
 
@@ -564,7 +561,7 @@ const Landing = () => {
               Workflow
             </p>
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              From registration to restock in three steps
+              From setup to daily operations in three steps
             </h2>
           </div>
 
@@ -584,33 +581,6 @@ const Landing = () => {
               </div>
             ))}
           </div>
-
-          <div className="mt-12 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 sm:p-8">
-            <p className="text-xs font-bold uppercase tracking-widest text-red-500 mb-4">
-              API surface
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-[12px] text-zinc-400">
-              {[
-                "POST /api/auth/register",
-                "POST /api/auth/login",
-                "POST /api/vehicles",
-                "GET /api/vehicles",
-                "GET /api/vehicles/search",
-                "PUT /api/vehicles/:id",
-                "DELETE /api/vehicles/:id",
-                "POST /api/vehicles/:id/purchase",
-                "POST /api/vehicles/:id/restock",
-              ].map((ep) => (
-                <div
-                  key={ep}
-                  className="flex items-center gap-2 rounded-lg bg-zinc-950/60 border border-zinc-800 px-3 py-2"
-                >
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  {ep}
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
@@ -622,14 +592,14 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           <div className="lg:col-span-4 space-y-6">
             <p className="text-xs font-bold uppercase tracking-widest text-red-500">
-              Rooftops
+              Locations
             </p>
             <h2 className="text-3xl font-extrabold tracking-tight">
               Multi-city inventory, one operating system
             </h2>
             <p className="text-sm text-zinc-400 leading-relaxed">
-              Sample dealership nodes across India. In production, each marker
-              maps to a rooftop with its own stock feed inside RevMotors.
+              Manage every rooftop from a single view. Each location stays
+              synchronized so your team always works with accurate stock.
             </p>
 
             <ul className="space-y-3">
@@ -653,7 +623,7 @@ const Landing = () => {
               to="/register"
               className="inline-flex items-center gap-2 text-sm font-semibold text-red-400 hover:text-red-300 transition-colors"
             >
-              Onboard your rooftop
+              Onboard your dealership
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -661,7 +631,7 @@ const Landing = () => {
           <div className="lg:col-span-8">
             <DealershipMap />
             <p className="mt-3 text-[11px] text-zinc-600 text-center">
-              Interactive map powered by Leaflet · dark tiles via CARTO
+              Interactive map · sample locations across India
             </p>
           </div>
         </div>
@@ -716,12 +686,11 @@ const Landing = () => {
           <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 backdrop-blur-xl p-10 sm:p-14 shadow-2xl">
             <Package className="w-10 h-10 text-red-500 mx-auto mb-5" />
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4">
-              Put your lot on record today
+              Put your lot in order today
             </h2>
             <p className="text-sm sm:text-base text-zinc-400 max-w-xl mx-auto mb-8">
-              Register, secure a JWT, load vehicles, and run purchase + restock
-              flows end to end. Built for the Car Dealership Inventory System
-              kata — designed like a real product.
+              Create your account, invite your team, and start managing inventory
+              with clarity and confidence. Built for modern dealerships.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
@@ -742,11 +711,11 @@ const Landing = () => {
 
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-zinc-500">
               <a
-                href="mailto:hello@revmotors.app"
+                href="mailto:hello@drivehub.app"
                 className="inline-flex items-center gap-2 hover:text-white transition-colors"
               >
                 <Mail className="w-4 h-4 text-red-500" />
-                hello@revmotors.app
+                hello@drivehub.app
               </a>
               <span className="hidden sm:inline text-zinc-700">·</span>
               <a
@@ -770,13 +739,13 @@ const Landing = () => {
                 <Flame className="w-4 h-4" />
               </div>
               <span className="font-bold tracking-widest text-zinc-200 uppercase text-sm">
-                RevMotors
+                DriveHub
               </span>
             </div>
             <p className="text-sm text-zinc-500 max-w-sm leading-relaxed">
-              Full-stack car dealership inventory system with JWT auth,
-              protected vehicle APIs, search, purchase, and restock — React,
-              Tailwind, and a real database.
+              Premium inventory management for modern car dealerships. Search,
+              sell, restock, and stay in complete control of every vehicle on
+              the lot.
             </p>
           </div>
 
@@ -819,8 +788,8 @@ const Landing = () => {
         </div>
 
         <div className="max-w-7xl mx-auto pt-8 border-t border-zinc-900 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-600">
-          <p>© {new Date().getFullYear()} RevMotors Inc. All rights reserved.</p>
-          <p>Car Dealership Inventory System · TDD Kata</p>
+          <p>© {new Date().getFullYear()} DriveHub. All rights reserved.</p>
+          <p>Premium Dealership Inventory</p>
         </div>
       </footer>
     </motion.div>
