@@ -66,3 +66,22 @@ test("password should be hashed before saving", async () => {
 
   expect(user.password).not.toBe("123456");
 });
+
+
+
+
+test("should login user with valid credentials", async () => {
+  await request(app).post("/api/auth/register").send({
+    name: "Abhay",
+    email: "abhay@test.com",
+    password: "123456",
+  });
+
+  const response = await request(app).post("/api/auth/login").send({
+    email: "abhay@test.com",
+    password: "123456",
+  });
+
+  expect(response.statusCode).toBe(200);
+  expect(response.body).toHaveProperty("token");
+});
