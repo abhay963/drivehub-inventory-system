@@ -11,6 +11,7 @@ import {
   Calendar,
   Tag,
   IndianRupee,
+  ImageOff,
 } from "lucide-react";
 import { getInventorySummary, getVehicles } from "../services/vehicleService";
 
@@ -198,31 +199,49 @@ const UserDashboard = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {availableVehicles.map((vehicle) => {
             const isOutOfStock = Number(vehicle.quantity) === 0;
+            // Supports both 'image' or 'imageUrl' fields coming from your backend model
+            const vehicleImage = vehicle.image || vehicle.imageUrl;
+
             return (
               <motion.div
                 variants={item}
                 key={vehicle._id || vehicle.id}
                 className="group rounded-2xl border border-zinc-800/80 bg-zinc-900/50 hover:border-zinc-700 overflow-hidden flex flex-col transition-all duration-300"
               >
-                {/* Vehicle image placeholder or tag */}
-                <div className="h-44 bg-zinc-950/60 border-b border-zinc-800/60 relative p-4 flex flex-col justify-between">
-                  <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-800/80 text-zinc-300 border border-zinc-700/50">
+                {/* Vehicle Image Preview Section */}
+                <div className="h-48 bg-zinc-950 border-b border-zinc-800/60 relative overflow-hidden">
+                  {vehicleImage ? (
+                    <img
+                      src={vehicleImage}
+                      alt={`${vehicle.brand} ${vehicle.model}`}
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-zinc-600 bg-zinc-950/80">
+                      <Car className="w-8 h-8 opacity-40" />
+                      <span className="text-[11px] font-medium uppercase tracking-wider">No Image Available</span>
+                    </div>
+                  )}
+
+                  {/* Overlays on Image */}
+                  <div className="absolute inset-x-0 top-0 p-3 flex items-center justify-between bg-gradient-to-b from-black/60 to-transparent">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-black/60 backdrop-blur-md text-zinc-200 border border-white/10">
                       <Tag className="w-3 h-3 text-red-500" />
                       {vehicle.category || "General"}
                     </span>
                     <span
-                      className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold ${
+                      className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold backdrop-blur-md ${
                         isOutOfStock
-                          ? "bg-rose-500/10 text-rose-400 border border-rose-500/20"
-                          : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                          ? "bg-rose-500/20 text-rose-300 border border-rose-500/30"
+                          : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
                       }`}
                     >
                       {isOutOfStock ? "Out of Stock" : `${vehicle.quantity} in stock`}
                     </span>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-white group-hover:text-red-400 transition-colors">
+
+                  <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+                    <h3 className="text-lg font-bold text-white group-hover:text-red-400 transition-colors drop-shadow">
                       {vehicle.brand} {vehicle.model}
                     </h3>
                   </div>
@@ -279,36 +298,53 @@ const UserDashboard = () => {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {recentlyAddedVehicles.map((vehicle) => {
-            const isOutOfStock = Number(vehicle.quantity) === 0;
+            const vehicleImage = vehicle.image || vehicle.imageUrl;
             return (
               <motion.div
                 variants={item}
                 key={`recent-${vehicle._id || vehicle.id}`}
-                className="rounded-2xl border border-zinc-800/80 bg-zinc-950/40 p-4 space-y-3 hover:border-zinc-700 transition-all"
+                className="rounded-2xl border border-zinc-800/80 bg-zinc-950/40 overflow-hidden hover:border-zinc-700 transition-all flex flex-col"
               >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <span className="text-[10px] uppercase tracking-wider font-semibold text-red-500">
-                      {vehicle.brand}
-                    </span>
-                    <h4 className="text-sm font-bold text-white truncate">
-                      {vehicle.model}
-                    </h4>
-                  </div>
-                  <span className="text-xs text-zinc-400 tabular-nums font-medium">
-                    {vehicle.year}
-                  </span>
+                {/* Small thumbnail image preview */}
+                <div className="h-28 bg-zinc-900 relative overflow-hidden">
+                  {vehicleImage ? (
+                    <img
+                      src={vehicleImage}
+                      alt={vehicle.model}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-zinc-700">
+                      <Car className="w-6 h-6 opacity-40" />
+                    </div>
+                  )}
                 </div>
-                <div className="flex items-center justify-between pt-2 border-t border-zinc-800/60">
-                  <span className="text-xs font-bold text-white tabular-nums">
-                    {formatINR(vehicle.price)}
-                  </span>
-                  <Link
-                    to="/inventory"
-                    className="text-xs font-medium text-zinc-400 hover:text-white transition-colors flex items-center gap-1"
-                  >
-                    View <ArrowRight className="w-3 h-3" />
-                  </Link>
+
+                <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <span className="text-[10px] uppercase tracking-wider font-semibold text-red-500">
+                        {vehicle.brand}
+                      </span>
+                      <h4 className="text-sm font-bold text-white truncate">
+                        {vehicle.model}
+                      </h4>
+                    </div>
+                    <span className="text-xs text-zinc-400 tabular-nums font-medium">
+                      {vehicle.year}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-zinc-800/60">
+                    <span className="text-xs font-bold text-white tabular-nums">
+                      {formatINR(vehicle.price)}
+                    </span>
+                    <Link
+                      to="/inventory"
+                      className="text-xs font-medium text-zinc-400 hover:text-white transition-colors flex items-center gap-1"
+                    >
+                      View <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </div>
                 </div>
               </motion.div>
             );
