@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
-
+import vehicleRoutes from "./routes/vehicleRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -15,6 +15,13 @@ app.use(express.json());
 
 //auth api
 app.use("/api/auth", authRoutes);
+
+
+
+
+//vehicle
+app.use("/api/vehicles", vehicleRoutes);
+
 
 app.get("/", (req, res) => {
   res.json({
