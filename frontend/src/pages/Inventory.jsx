@@ -12,6 +12,8 @@ import {
   Car,
   Plus,
   AlertCircle,
+  X,
+  ImageOff,
 } from "lucide-react";
 import Layout from "../components/layout/Layout";
 import {
@@ -47,6 +49,10 @@ const Inventory = () => {
   const [loading, setLoading] = useState(true);
   const [actionId, setActionId] = useState(null);
   const [error, setError] = useState("");
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [restockTarget, setRestockTarget] = useState(null);
+  const [restockQuantity, setRestockQuantity] = useState("");
+  const [restockError, setRestockError] = useState("");
 
   // Role check based on localStorage user object
   const user = JSON.parse(localStorage.getItem("user"));
@@ -102,6 +108,9 @@ const Inventory = () => {
       setActionId(id);
       await deleteVehicle(id);
       setVehicles((prev) => prev.filter((v) => v._id !== id));
+      if (selectedVehicle?._id === id) {
+        setSelectedVehicle(null);
+      }
     } catch (err) {
       alert(err.response?.data?.message || "Failed to delete vehicle");
     } finally {
@@ -116,6 +125,9 @@ const Inventory = () => {
       setVehicles((prev) =>
         prev.map((v) => (v._id === id ? data.vehicle : v))
       );
+      setSelectedVehicle((prev) =>
+        prev?._id === id ? data.vehicle : prev
+      );
     } catch (err) {
       alert(err.response?.data?.message || "Purchase failed");
     } finally {
@@ -123,18 +135,43 @@ const Inventory = () => {
     }
   };
 
-  const handleRestock = async (id) => {
-    const quantity = prompt("Enter quantity to restock:");
-    if (!quantity) return;
+  const openRestockDialog = (vehicle) => {
+    setRestockTarget(vehicle);
+    setRestockQuantity("");
+    setRestockError("");
+  };
+
+  const closeRestockDialog = () => {
+    if (actionId) return;
+    setRestockTarget(null);
+    setRestockQuantity("");
+    setRestockError("");
+  };
+
+  const handleRestockSubmit = async (e) => {
+    e.preventDefault();
+
+    const quantity = Number(restockQuantity);
+
+    if (!Number.isInteger(quantity) || quantity <= 0) {
+      setRestockError("Enter a whole number greater than 0.");
+      return;
+    }
 
     try {
-      setActionId(id);
-      const data = await restockVehicle(id, Number(quantity));
+      setActionId(restockTarget._id);
+      setRestockError("");
+      const data = await restockVehicle(restockTarget._id, quantity);
       setVehicles((prev) =>
-        prev.map((v) => (v._id === id ? data.vehicle : v))
+        prev.map((v) => (v._id === restockTarget._id ? data.vehicle : v))
       );
+      setSelectedVehicle((prev) =>
+        prev?._id === restockTarget._id ? data.vehicle : prev
+      );
+      setRestockTarget(null);
+      setRestockQuantity("");
     } catch (err) {
-      alert(err.response?.data?.message || "Restock failed");
+      setRestockError(err.response?.data?.message || "Restock failed");
     } finally {
       setActionId(null);
     }
@@ -246,6 +283,7 @@ const Inventory = () => {
                 <thead>
                   <tr className="border-b border-zinc-800">
                     {[
+                      "Photo",
                       "Brand",
                       "Model",
                       "Category",
@@ -271,8 +309,22 @@ const Inventory = () => {
                       return (
                         <tr
                           key={vehicle._id}
-                          className="hover:bg-white/[0.02] transition-colors"
+                          onClick={() => setSelectedVehicle(vehicle)}
+                          className="hover:bg-white/[0.02] transition-colors cursor-pointer"
                         >
+                          <td className="px-4 py-4">
+                            <div className="w-16 h-11 rounded-lg border border-zinc-800 bg-zinc-950 overflow-hidden flex items-center justify-center">
+                              {vehicle.image ? (
+                                <img
+                                  src={vehicle.image}
+                                  alt={`${vehicle.brand} ${vehicle.model}`}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <ImageOff className="w-4 h-4 text-zinc-600" />
+                              )}
+                            </div>
+                          </td>
                           <td className="px-4 py-4 text-[13.5px] font-semibold text-white">
                             {vehicle.brand}
                           </td>
@@ -304,6 +356,7 @@ const Inventory = () => {
                               {isAdmin && (
                                 <Link
                                   to={`/edit-vehicle/${vehicle._id}`}
+                                  onClick={(e) => e.stopPropagation()}
                                   className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700/60 bg-zinc-800/40 px-2.5 py-1.5 text-[12px] font-medium text-zinc-300 hover:text-white hover:border-zinc-600 transition-all"
                                 >
                                   <Pencil className="w-3.5 h-3.5" />
@@ -313,7 +366,10 @@ const Inventory = () => {
 
                               {isAdmin && (
                                 <button
-                                  onClick={() => handleDelete(vehicle._id)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDelete(vehicle._id);
+                                  }}
                                   disabled={busy}
                                   className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/25 bg-rose-500/10 px-2.5 py-1.5 text-[12px] font-medium text-rose-400 hover:bg-rose-500/20 transition-all disabled:opacity-50"
                                 >
@@ -322,28 +378,36 @@ const Inventory = () => {
                                 </button>
                               )}
 
-                              <button
-                                onClick={() => handlePurchase(vehicle._id)}
-                                disabled={vehicle.quantity === 0 || busy}
-                                className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-                                  vehicle.quantity === 0
-                                    ? "border border-zinc-700 bg-zinc-800/40 text-zinc-500"
-                                    : "border border-emerald-500/25 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                                }`}
-                              >
-                                {busy ? (
-                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                ) : (
-                                  <ShoppingCart className="w-3.5 h-3.5" />
-                                )}
-                                {vehicle.quantity === 0
-                                  ? "Out of Stock"
-                                  : "Purchase"}
-                              </button>
+                              {!isAdmin && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handlePurchase(vehicle._id);
+                                  }}
+                                  disabled={vehicle.quantity === 0 || busy}
+                                  className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                                    vehicle.quantity === 0
+                                      ? "border border-zinc-700 bg-zinc-800/40 text-zinc-500"
+                                      : "border border-emerald-500/25 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                                  }`}
+                                >
+                                  {busy ? (
+                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                  ) : (
+                                    <ShoppingCart className="w-3.5 h-3.5" />
+                                  )}
+                                  {vehicle.quantity === 0
+                                    ? "Out of Stock"
+                                    : "Purchase"}
+                                </button>
+                              )}
 
                               {isAdmin && (
                                 <button
-                                  onClick={() => handleRestock(vehicle._id)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    openRestockDialog(vehicle);
+                                  }}
                                   disabled={busy}
                                   className="inline-flex items-center gap-1.5 rounded-lg border border-violet-500/25 bg-violet-500/10 px-2.5 py-1.5 text-[12px] font-medium text-violet-400 hover:bg-violet-500/20 transition-all disabled:opacity-50"
                                 >
@@ -359,7 +423,7 @@ const Inventory = () => {
                   ) : (
                     <tr>
                       <td
-                        colSpan={7}
+                        colSpan={8}
                         className="px-4 py-16 text-center text-sm text-zinc-500"
                       >
                         No vehicles found.
@@ -371,6 +435,281 @@ const Inventory = () => {
             </div>
           </div>
         )}
+
+        <AnimatePresence>
+          {selectedVehicle && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6"
+              onClick={() => setSelectedVehicle(null)}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96, y: 12 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96, y: 12 }}
+                transition={{ duration: 0.2 }}
+                className="w-full max-w-4xl overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-[1.15fr_0.85fr]">
+                  <div className="min-h-[260px] bg-zinc-900 flex items-center justify-center">
+                    {selectedVehicle.image ? (
+                      <img
+                        src={selectedVehicle.image}
+                        alt={`${selectedVehicle.brand} ${selectedVehicle.model}`}
+                        className="w-full h-full max-h-[520px] object-cover"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center gap-3 text-zinc-600">
+                        <ImageOff className="w-10 h-10" />
+                        <span className="text-sm font-medium">
+                          No image uploaded
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-6">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-wider text-red-400">
+                          {selectedVehicle.category}
+                        </p>
+                        <h2 className="mt-1 text-2xl font-bold text-white">
+                          {selectedVehicle.brand} {selectedVehicle.model}
+                        </h2>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedVehicle(null)}
+                        className="shrink-0 rounded-lg border border-zinc-800 bg-zinc-900 p-2 text-zinc-400 hover:text-white"
+                        title="Close"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div className="mt-6 grid grid-cols-2 gap-3">
+                      <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
+                        <p className="text-[11px] uppercase tracking-wider text-zinc-500">
+                          Year
+                        </p>
+                        <p className="mt-1 text-lg font-semibold text-white">
+                          {selectedVehicle.year}
+                        </p>
+                      </div>
+                      <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
+                        <p className="text-[11px] uppercase tracking-wider text-zinc-500">
+                          Stock
+                        </p>
+                        <p className="mt-1 text-lg font-semibold text-white">
+                          {selectedVehicle.quantity}
+                        </p>
+                      </div>
+                      <div className="col-span-2 rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
+                        <p className="text-[11px] uppercase tracking-wider text-zinc-500">
+                          Price
+                        </p>
+                        <p className="mt-1 text-2xl font-bold text-white">
+                          {formatPrice(selectedVehicle.price)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      {isAdmin && (
+                        <Link
+                          to={`/edit-vehicle/${selectedVehicle._id}`}
+                          className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm font-medium text-zinc-200 hover:text-white"
+                        >
+                          <Pencil className="w-4 h-4" />
+                          Edit
+                        </Link>
+                      )}
+
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(selectedVehicle._id)}
+                          disabled={actionId === selectedVehicle._id}
+                          className="inline-flex items-center gap-2 rounded-lg border border-rose-500/25 bg-rose-500/10 px-3 py-2 text-sm font-medium text-rose-400 hover:bg-rose-500/20 disabled:opacity-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Delete
+                        </button>
+                      )}
+
+                      {!isAdmin && (
+                        <button
+                          type="button"
+                          onClick={() => handlePurchase(selectedVehicle._id)}
+                          disabled={
+                            selectedVehicle.quantity === 0 ||
+                            actionId === selectedVehicle._id
+                          }
+                          className="inline-flex items-center gap-2 rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-3 py-2 text-sm font-medium text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {actionId === selectedVehicle._id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <ShoppingCart className="w-4 h-4" />
+                          )}
+                          {selectedVehicle.quantity === 0
+                            ? "Out of Stock"
+                            : "Purchase"}
+                        </button>
+                      )}
+
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          onClick={() => openRestockDialog(selectedVehicle)}
+                          disabled={actionId === selectedVehicle._id}
+                          className="inline-flex items-center gap-2 rounded-lg border border-violet-500/25 bg-violet-500/10 px-3 py-2 text-sm font-medium text-violet-400 hover:bg-violet-500/20 disabled:opacity-50"
+                        >
+                          <PackagePlus className="w-4 h-4" />
+                          Restock
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {restockTarget && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[60] flex items-center justify-center bg-black/75 px-4 py-6"
+              onClick={closeRestockDialog}
+            >
+              <motion.form
+                initial={{ opacity: 0, scale: 0.96, y: 12 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96, y: 12 }}
+                transition={{ duration: 0.2 }}
+                onSubmit={handleRestockSubmit}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full max-w-md overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl"
+              >
+                <div className="flex items-start justify-between gap-4 border-b border-zinc-800 p-5">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-violet-500/25 bg-violet-500/10 text-violet-400">
+                      <PackagePlus className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-bold text-white">
+                        Restock Vehicle
+                      </h2>
+                      <p className="mt-1 text-sm text-zinc-500">
+                        {restockTarget.brand} {restockTarget.model}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={closeRestockDialog}
+                    disabled={actionId === restockTarget._id}
+                    className="rounded-lg border border-zinc-800 bg-zinc-900 p-2 text-zinc-400 hover:text-white disabled:opacity-50"
+                    title="Close"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="space-y-4 p-5">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
+                      <p className="text-[11px] uppercase tracking-wider text-zinc-500">
+                        Current Stock
+                      </p>
+                      <p className="mt-1 text-xl font-bold text-white">
+                        {restockTarget.quantity}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
+                      <p className="text-[11px] uppercase tracking-wider text-zinc-500">
+                        After Restock
+                      </p>
+                      <p className="mt-1 text-xl font-bold text-white">
+                        {Number(restockTarget.quantity || 0) +
+                          Number(restockQuantity || 0)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="restock-quantity"
+                      className="mb-1.5 block text-[12px] font-semibold uppercase tracking-wider text-zinc-500"
+                    >
+                      Quantity to Add
+                    </label>
+                    <input
+                      id="restock-quantity"
+                      type="number"
+                      min="1"
+                      step="1"
+                      value={restockQuantity}
+                      onChange={(e) => {
+                        setRestockQuantity(e.target.value);
+                        setRestockError("");
+                      }}
+                      autoFocus
+                      className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-[14px] text-white outline-none transition-all placeholder:text-zinc-600 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/15"
+                      placeholder="e.g. 5"
+                    />
+                  </div>
+
+                  <AnimatePresence>
+                    {restockError && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300"
+                      >
+                        <AlertCircle className="w-4 h-4 shrink-0" />
+                        {restockError}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <div className="flex flex-col-reverse gap-2 border-t border-zinc-800 p-5 sm:flex-row sm:justify-end">
+                  <button
+                    type="button"
+                    onClick={closeRestockDialog}
+                    disabled={actionId === restockTarget._id}
+                    className="rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={actionId === restockTarget._id}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-600/20 transition-all hover:bg-violet-500 disabled:opacity-50"
+                  >
+                    {actionId === restockTarget._id ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <PackagePlus className="w-4 h-4" />
+                    )}
+                    Update Stock
+                  </button>
+                </div>
+              </motion.form>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </Layout>
   );
