@@ -12,6 +12,8 @@ import {
   ArrowLeft,
   Plus,
   AlertCircle,
+  Upload,
+  X,
 } from "lucide-react";
 import Layout from "../components/layout/Layout";
 import { addVehicle } from "../services/vehicleService";
@@ -47,8 +49,10 @@ const AddVehicle = () => {
     year: "",
     price: "",
     quantity: "",
+    image: null,
   });
 
+  const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -58,6 +62,26 @@ const AddVehicle = () => {
       [e.target.name]: e.target.value,
     }));
     setError("");
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData((prev) => ({
+        ...prev,
+        image: file,
+      }));
+      setImagePreview(URL.createObjectURL(file));
+      setError("");
+    }
+  };
+
+  const removeImage = () => {
+    setFormData((prev) => ({
+      ...prev,
+      image: null,
+    }));
+    setImagePreview(null);
   };
 
   const handleSubmit = async (e) => {
@@ -299,6 +323,57 @@ const AddVehicle = () => {
                   required
                   className={fieldClass}
                 />
+              </div>
+            </div>
+
+            {/* Vehicle Image Upload Section */}
+            <div>
+              <label
+                htmlFor="vehicle-image-upload"
+                className="block text-[12px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5"
+              >
+                Vehicle Image
+              </label>
+              <div className="relative">
+                {imagePreview ? (
+                  <div className="relative w-full h-48 rounded-xl border border-zinc-800 bg-zinc-950 overflow-hidden flex items-center justify-center">
+                    <img
+                      src={imagePreview}
+                      alt="Vehicle Preview"
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={removeImage}
+                      className="absolute top-3 right-3 p-1.5 rounded-lg bg-zinc-900/80 border border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all"
+                      title="Remove image"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <label
+                    htmlFor="vehicle-image-upload"
+                    className="flex flex-col items-center justify-center w-full h-40 rounded-xl border border-dashed border-zinc-800 bg-zinc-950/60 hover:border-zinc-700 hover:bg-zinc-950 cursor-pointer transition-all group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-400 mb-2 group-hover:scale-105 transition-transform">
+                      <Upload className="w-5 h-5" />
+                    </div>
+                    <p className="text-sm font-medium text-zinc-400 group-hover:text-zinc-300 transition-colors">
+                      Click to upload vehicle image
+                    </p>
+                    <p className="text-xs text-zinc-600 mt-1">
+                      PNG, JPG or WEBP (up to 5MB)
+                    </p>
+                    <input
+                      id="vehicle-image-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </label>
+                )}
               </div>
             </div>
 

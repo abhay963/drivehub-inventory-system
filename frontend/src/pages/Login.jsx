@@ -37,25 +37,33 @@ const Login = () => {
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
+const onSubmit = async (data) => {
+  try {
+    const response = await loginUser({
+      email: data.email.trim().toLowerCase(),
+      password: data.password,
+    });
 
-  const onSubmit = async (data) => {
-    try {
-      const response = await loginUser({
-        email: data.email.trim().toLowerCase(),
-        password: data.password,
-      });
     localStorage.setItem("token", response.token);
-localStorage.setItem("user", JSON.stringify(response.user));
+    localStorage.setItem("user", JSON.stringify(response.user));
 
-login(response.token);
-     
-      toast.success("Ignition sequence complete. Welcome back!");
-      navigate("/dashboard");
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Invalid credentials. Check your clearance.");
+    login(response.token);
+
+    toast.success("Login Successful 🚗");
+
+    navigate("/dashboard");
+  } catch (err) {
+    console.error(err);
+
+    if (err.response) {
+      toast.error(err.response.data.message);
+    } else if (err.request) {
+      toast.error("Unable to connect to server.");
+    } else {
+      toast.error(err.message || "Something went wrong.");
     }
-  };
-
+  }
+};
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-12 bg-zinc-950 text-white font-sans overflow-hidden">
       

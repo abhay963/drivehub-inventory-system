@@ -29,4 +29,13 @@ app.get("/", (req, res) => {
   });
 });
 
+
+app.use((err, req, res, next) => {
+  console.error("🔥 EXPRESS ERROR");
+  console.error(err);
+
+  res.status(500).json({
+    message: err.message,
+  });
+});
 export default app;

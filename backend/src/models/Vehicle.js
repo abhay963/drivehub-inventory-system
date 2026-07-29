@@ -13,6 +13,7 @@ const vehicleSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+
     category: {
       type: String,
       required: true,
@@ -27,6 +28,7 @@ const vehicleSchema = new mongoose.Schema(
         "Sports",
       ],
     },
+
     year: {
       type: Number,
       required: true,
@@ -43,6 +45,16 @@ const vehicleSchema = new mongoose.Schema(
       required: true,
       default: 0,
       min: 0,
+    },
+
+   image: {
+  type: String,
+  default: "",
+},
+
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
   },
   {

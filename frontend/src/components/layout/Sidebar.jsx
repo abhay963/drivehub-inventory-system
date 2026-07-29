@@ -16,12 +16,11 @@ const Sidebar = () => {
   const user = JSON.parse(localStorage.getItem("user"));
  
 
-console.log(user);
-console.log(user?.role);
+
 
 const isAdmin = user?.role === "admin";
 
-console.log(isAdmin);
+
 
   // Filter links based on user role
   const links = allLinks.filter((link) => !link.adminOnly || isAdmin);

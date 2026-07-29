@@ -1,8 +1,18 @@
 import Vehicle from "../models/Vehicle.js";
-import User from "../models/User.js";
+
+import Purchase from "../models/Purchase.js";
+
+
 export const createVehicle = async (req, res) => {
   try {
-    const { brand, model, category, year, price, quantity } = req.body;
+    const {
+      brand,
+      model,
+      category,
+      year,
+      price,
+      quantity,
+    } = req.body;
 
     const vehicle = await Vehicle.create({
       brand,
@@ -11,19 +21,24 @@ export const createVehicle = async (req, res) => {
       year,
       price,
       quantity,
+      image: req.file?.path || "",
+      createdBy: req.user.id,
     });
 
     res.status(201).json({
+      success: true,
       message: "Vehicle added successfully",
       vehicle,
     });
   } catch (error) {
+    console.error(error);
+
     res.status(500).json({
+      success: false,
       message: error.message,
     });
   }
 };
-import Purchase from "../models/Purchase.js";
 
 
 
@@ -61,20 +76,27 @@ export const getVehicleById = async (req, res) => {
 
 export const updateVehicle = async (req, res) => {
   try {
-    const vehicle = await Vehicle.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    const vehicle = await Vehicle.findById(req.params.id);
 
     if (!vehicle) {
       return res.status(404).json({
         message: "Vehicle not found",
       });
     }
+
+    // If a new image is uploaded
+    if (req.file) {
+      vehicle.image = req.file.path;
+    }
+
+    vehicle.brand = req.body.brand ?? vehicle.brand;
+    vehicle.model = req.body.model ?? vehicle.model;
+    vehicle.category = req.body.category ?? vehicle.category;
+    vehicle.year = req.body.year ?? vehicle.year;
+    vehicle.price = req.body.price ?? vehicle.price;
+    vehicle.quantity = req.body.quantity ?? vehicle.quantity;
+
+    await vehicle.save();
 
     res.status(200).json({
       message: "Vehicle updated successfully",
@@ -89,10 +111,9 @@ export const updateVehicle = async (req, res) => {
 
 
 
-
 export const deleteVehicle = async (req, res) => {
   try {
-    const vehicle = await Vehicle.findByIdAndDelete(req.params.id);
+    const vehicle = await Vehicle.findById(req.params.id);
 
     if (!vehicle) {
       return res.status(404).json({
@@ -100,18 +121,19 @@ export const deleteVehicle = async (req, res) => {
       });
     }
 
+    await vehicle.deleteOne();
+
     res.status(200).json({
+      success: true,
       message: "Vehicle deleted successfully",
     });
   } catch (error) {
     res.status(500).json({
+      success: false,
       message: error.message,
     });
   }
 };
-
-
-
 
 export const searchVehicles = async (req, res) => {
   try {

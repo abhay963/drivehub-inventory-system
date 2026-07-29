@@ -12,10 +12,27 @@ export const searchVehicles = async (query) => {
 
 
 export const addVehicle = async (vehicleData) => {
-  const response = await api.post("/vehicles", vehicleData);
+  const formData = new FormData();
+
+  formData.append("brand", vehicleData.brand);
+  formData.append("model", vehicleData.model);
+  formData.append("category", vehicleData.category);
+  formData.append("year", vehicleData.year);
+  formData.append("price", vehicleData.price);
+  formData.append("quantity", vehicleData.quantity);
+
+  if (vehicleData.image) {
+    formData.append("image", vehicleData.image);
+  }
+
+  const response = await api.post("/vehicles", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
   return response.data;
 };
-
 
 export const getVehicleById = async (id) => {
   const response = await api.get(`/vehicles/${id}`);
@@ -23,7 +40,25 @@ export const getVehicleById = async (id) => {
 };
 
 export const updateVehicle = async (id, vehicleData) => {
-  const response = await api.put(`/vehicles/${id}`, vehicleData);
+  const formData = new FormData();
+
+  formData.append("brand", vehicleData.brand);
+  formData.append("model", vehicleData.model);
+  formData.append("category", vehicleData.category);
+  formData.append("year", vehicleData.year);
+  formData.append("price", vehicleData.price);
+  formData.append("quantity", vehicleData.quantity);
+
+  if (vehicleData.image) {
+    formData.append("image", vehicleData.image);
+  }
+
+  const response = await api.put(`/vehicles/${id}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
   return response.data;
 };
 
