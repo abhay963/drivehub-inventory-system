@@ -167,6 +167,32 @@ export const purchaseVehicle = async (req, res) => {
   }
 };
 
+export const getInventorySummary = async (req, res) => {
+  try {
+    const vehicles = await Vehicle.find();
 
+    const totalVehicles = vehicles.length;
+
+    const totalStock = vehicles.reduce(
+      (sum, vehicle) => sum + vehicle.quantity,
+      0
+    );
+
+    const totalInventoryValue = vehicles.reduce(
+      (sum, vehicle) => sum + vehicle.price * vehicle.quantity,
+      0
+    );
+
+    res.status(200).json({
+      totalVehicles,
+      totalStock,
+      totalInventoryValue,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
 

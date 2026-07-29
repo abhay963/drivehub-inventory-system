@@ -240,3 +240,39 @@ const createResponse = await request(app).post("/api/vehicles").send({
   expect(response.statusCode).toBe(200);
   expect(response.body.vehicle.quantity).toBe(4);
 });
+
+
+
+
+
+
+
+test("GET /api/vehicles/summary should return inventory summary", async () => {
+await request(app).post("/api/vehicles").send({
+  brand: "Toyota",
+  model: "Fortuner",
+  category: "SUV",
+  year: 2023,
+  price: 4200000,
+  quantity: 5,
+});
+
+await request(app).post("/api/vehicles").send({
+  brand: "Honda",
+  model: "City",
+  category: "Sedan",
+  year: 2022,
+  price: 1500000,
+  quantity: 3,
+});
+
+  const response = await request(app).get("/api/vehicles/summary");
+
+  expect(response.statusCode).toBe(200);
+
+  expect(response.body.totalVehicles).toBe(2);
+  expect(response.body.totalStock).toBe(8);
+  expect(response.body.totalInventoryValue).toBe(
+    (4200000 * 5) + (1500000 * 3)
+  );
+});
