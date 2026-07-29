@@ -170,11 +170,6 @@ const Inventory = () => {
   const wouldBeNegative =
     isValidQty && stockMode === "decrease" && updatedStock < 0;
 
-  const canSubmit =
-    isValidQty &&
-    !wouldBeNegative &&
-    actionId !== restockTarget?._id;
-
   const handleRestockSubmit = async (e) => {
     e.preventDefault();
 
@@ -278,7 +273,7 @@ const Inventory = () => {
             className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:text-white hover:border-zinc-700 font-medium px-5 py-3 text-[13.5px] transition-all"
           >
             <RotateCcw className="w-4 h-4" />
-            Reset
+            Refresh
           </button>
         </div>
 
@@ -297,7 +292,7 @@ const Inventory = () => {
           )}
         </AnimatePresence>
 
-        {/* Table */}
+        {/* Cards Grid Section */}
         {loading ? (
           <div className="flex flex-col items-center justify-center min-h-[40vh] gap-3">
             <Loader2 className="w-7 h-7 text-red-500 animate-spin" />
@@ -306,164 +301,138 @@ const Inventory = () => {
             </p>
           </div>
         ) : (
-          <div className="relative overflow-hidden rounded-2xl border border-zinc-800/80 bg-zinc-900/40 shadow-xl">
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-red-500/40 to-transparent" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {vehicles.length > 0 ? (
+              vehicles.map((vehicle) => {
+                const busy = actionId === vehicle._id;
+                return (
+                  <motion.div
+                    key={vehicle._id}
+                    layout
+                    onClick={() => setSelectedVehicle(vehicle)}
+                    className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-800/80 bg-zinc-900/40 hover:border-zinc-700/80 shadow-xl transition-all cursor-pointer"
+                  >
+                    <div>
+                      {/* Vehicle Image Banner */}
+                      <div className="relative w-full h-44 bg-zinc-950 overflow-hidden border-b border-zinc-800/80">
+                        {vehicle.image ? (
+                          <img
+                            src={vehicle.image}
+                            alt={`${vehicle.brand} ${vehicle.model}`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center justify-center h-full text-zinc-600 gap-1.5">
+                            <ImageOff className="w-6 h-6" />
+                            <span className="text-xs">No image</span>
+                          </div>
+                        )}
 
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[800px] text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-zinc-800">
-                    {[
-                      "Photo",
-                      "Brand",
-                      "Model",
-                      "Category",
-                      "Year",
-                      "Price",
-                      "Qty",
-                      "Actions",
-                    ].map((h) => (
-                      <th
-                        key={h}
-                        className="px-4 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500"
-                      >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
+                        {/* Top Badges */}
+                        <div className="absolute top-3 inset-x-3 flex items-center justify-between pointer-events-none">
+                          <span className="inline-flex rounded-lg border border-zinc-700/60 bg-zinc-900/80 backdrop-blur-md px-2.5 py-1 text-[11px] font-medium text-zinc-300 shadow-md">
+                            {vehicle.category}
+                          </span>
+                          <span
+                            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold backdrop-blur-md shadow-md tabular-nums ${stockBadge(
+                              vehicle.quantity
+                            )}`}
+                          >
+                            Qty: {vehicle.quantity}
+                          </span>
+                        </div>
+                      </div>
 
-                <tbody className="divide-y divide-zinc-800/80">
-                  {vehicles.length > 0 ? (
-                    vehicles.map((vehicle) => {
-                      const busy = actionId === vehicle._id;
-                      return (
-                        <tr
-                          key={vehicle._id}
-                          onClick={() => setSelectedVehicle(vehicle)}
-                          className="hover:bg-white/[0.02] transition-colors cursor-pointer"
-                        >
-                          <td className="px-4 py-4">
-                            <div className="w-16 h-11 rounded-lg border border-zinc-800 bg-zinc-950 overflow-hidden flex items-center justify-center">
-                              {vehicle.image ? (
-                                <img
-                                  src={vehicle.image}
-                                  alt={`${vehicle.brand} ${vehicle.model}`}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <ImageOff className="w-4 h-4 text-zinc-600" />
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-4 py-4 text-[13.5px] font-semibold text-white">
-                            {vehicle.brand}
-                          </td>
-                          <td className="px-4 py-4 text-[13.5px] text-zinc-300">
-                            {vehicle.model}
-                          </td>
-                          <td className="px-4 py-4">
-                            <span className="inline-flex rounded-lg border border-zinc-700/60 bg-zinc-800/50 px-2.5 py-1 text-[11.5px] font-medium text-zinc-300">
-                              {vehicle.category}
-                            </span>
-                          </td>
-                          <td className="px-4 py-4 text-[13.5px] text-zinc-400 tabular-nums">
-                            {vehicle.year}
-                          </td>
-                          <td className="px-4 py-4 text-[13.5px] font-semibold text-white tabular-nums">
+                      {/* Content Body */}
+                      <div className="p-4 space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+                              {vehicle.year}
+                            </p>
+                            <h3 className="text-base font-bold text-white leading-tight">
+                              {vehicle.brand} {vehicle.model}
+                            </h3>
+                          </div>
+                        </div>
+
+                        <div className="pt-1">
+                          <span className="text-lg font-bold text-white tabular-nums">
                             {formatPrice(vehicle.price)}
-                          </td>
-                          <td className="px-4 py-4">
-                            <span
-                              className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11.5px] font-semibold tabular-nums ${stockBadge(
-                                vehicle.quantity
-                              )}`}
-                            >
-                              {vehicle.quantity}
-                            </span>
-                          </td>
-                          <td className="px-4 py-4">
-                            <div className="flex flex-wrap items-center gap-1.5">
-                              {isAdmin && (
-                                <Link
-                                  to={`/edit-vehicle/${vehicle._id}`}
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700/60 bg-zinc-800/40 px-2.5 py-1.5 text-[12px] font-medium text-zinc-300 hover:text-white hover:border-zinc-600 transition-all"
-                                >
-                                  <Pencil className="w-3.5 h-3.5" />
-                                  Edit
-                                </Link>
-                              )}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
 
-                              {isAdmin && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDelete(vehicle._id);
-                                  }}
-                                  disabled={busy}
-                                  className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/25 bg-rose-500/10 px-2.5 py-1.5 text-[12px] font-medium text-rose-400 hover:bg-rose-500/20 transition-all disabled:opacity-50"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                  Delete
-                                </button>
-                              )}
+                    {/* Card Action Buttons */}
+                    <div className="p-4 pt-0 mt-auto flex items-center gap-1.5 border-t border-zinc-800/60 mt-3 pt-3">
+                      {isAdmin && (
+                        <Link
+                          to={`/edit-vehicle/${vehicle._id}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-zinc-700/60 bg-zinc-800/40 py-2 text-[12px] font-medium text-zinc-300 hover:text-white hover:border-zinc-600 transition-all"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                          Edit
+                        </Link>
+                      )}
 
-                              {!isAdmin && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handlePurchase(vehicle._id);
-                                  }}
-                                  disabled={vehicle.quantity === 0 || busy}
-                                  className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-                                    vehicle.quantity === 0
-                                      ? "border border-zinc-700 bg-zinc-800/40 text-zinc-500"
-                                      : "border border-emerald-500/25 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                                  }`}
-                                >
-                                  {busy ? (
-                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                  ) : (
-                                    <ShoppingCart className="w-3.5 h-3.5" />
-                                  )}
-                                  {vehicle.quantity === 0
-                                    ? "Out of Stock"
-                                    : "Purchase"}
-                                </button>
-                              )}
+                      {isAdmin && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(vehicle._id);
+                          }}
+                          disabled={busy}
+                          className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-rose-500/25 bg-rose-500/10 px-3 py-2 text-[12px] font-medium text-rose-400 hover:bg-rose-500/20 transition-all disabled:opacity-50"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
 
-                              {isAdmin && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    openRestockDialog(vehicle);
-                                  }}
-                                  disabled={busy}
-                                  className="inline-flex items-center gap-1.5 rounded-lg border border-violet-500/25 bg-violet-500/10 px-2.5 py-1.5 text-[12px] font-medium text-violet-400 hover:bg-violet-500/20 transition-all disabled:opacity-50"
-                                >
-                                  <PackagePlus className="w-3.5 h-3.5" />
-                                  Restock
-                                </button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan={8}
-                        className="px-4 py-16 text-center text-sm text-zinc-500"
-                      >
-                        No vehicles found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                      {!isAdmin && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePurchase(vehicle._id);
+                          }}
+                          disabled={vehicle.quantity === 0 || busy}
+                          className={`flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl py-2 text-[12px] font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                            vehicle.quantity === 0
+                              ? "border border-zinc-700 bg-zinc-800/40 text-zinc-500"
+                              : "border border-emerald-500/25 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                          }`}
+                        >
+                          {busy ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <ShoppingCart className="w-3.5 h-3.5" />
+                          )}
+                          {vehicle.quantity === 0 ? "Out of Stock" : "Purchase"}
+                        </button>
+                      )}
+
+                      {isAdmin && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openRestockDialog(vehicle);
+                          }}
+                          disabled={busy}
+                          className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-violet-500/25 bg-violet-500/10 px-3 py-2 text-[12px] font-medium text-violet-400 hover:bg-violet-500/20 transition-all disabled:opacity-50"
+                        >
+                          <PackagePlus className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })
+            ) : (
+              <div className="col-span-full py-16 text-center text-sm text-zinc-500">
+                No vehicles found.
+              </div>
+            )}
           </div>
         )}
 
@@ -759,31 +728,14 @@ const Inventory = () => {
                       }`}
                       placeholder="e.g. 5"
                     />
-                    <p className="mt-2 text-[12px] text-zinc-500">
-                      {stockMode === "increase"
-                        ? "This amount will be added to current stock."
-                        : "This amount will be removed from current stock."}
-                    </p>
                   </div>
 
-                  <AnimatePresence>
-                    {(restockError || wouldBeNegative) && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300"
-                      >
-                        <AlertCircle className="w-4 h-4 shrink-0" />
-                        {restockError ||
-                          "Insufficient stock. Cannot reduce below 0."}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  {restockError && (
+                    <p className="text-xs text-rose-400 font-medium">{restockError}</p>
+                  )}
                 </div>
 
-                {/* Footer */}
-                <div className="flex flex-col-reverse gap-2 border-t border-zinc-800 p-5 sm:flex-row sm:justify-end">
+                <div className="flex items-center justify-end gap-2 border-t border-zinc-800 bg-zinc-900/50 p-4">
                   <button
                     type="button"
                     onClick={closeRestockDialog}
@@ -794,15 +746,15 @@ const Inventory = () => {
                   </button>
                   <button
                     type="submit"
-                    disabled={!canSubmit}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-600/20 transition-all hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={!isValidQty || wouldBeNegative || actionId === restockTarget._id}
+                    className="inline-flex items-center gap-2 rounded-xl bg-violet-600 hover:bg-violet-500 px-4 py-2.5 text-sm font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {actionId === restockTarget._id ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
                       <PackagePlus className="w-4 h-4" />
                     )}
-                    Update Stock
+                    Confirm Update
                   </button>
                 </div>
               </motion.form>
