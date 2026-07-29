@@ -16,15 +16,30 @@ const purchaseSchema = new mongoose.Schema(
 
     quantity: {
       type: Number,
-      required: true,
       default: 1,
       min: 1,
+    },
+
+    price: {
+      type: Number,
+      required: true,
     },
 
     totalPrice: {
       type: Number,
       required: true,
-      min: 0,
+    },
+
+    paymentStatus: {
+      type: String,
+      enum: ["Paid", "Pending", "Failed"],
+      default: "Paid",
+    },
+
+    deliveryStatus: {
+      type: String,
+      enum: ["Processing", "Shipped", "Delivered"],
+      default: "Processing",
     },
   },
   {

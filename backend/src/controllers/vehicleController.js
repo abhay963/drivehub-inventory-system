@@ -179,11 +179,14 @@ export const purchaseVehicle = async (req, res) => {
     await vehicle.save();
 
     const purchase = await Purchase.create({
-      user: req.user.id,
-      vehicle: vehicle._id,
-      quantity: 1,
-      totalPrice: vehicle.price,
-    });
+    user: req.user.id,
+    vehicle: vehicle._id,
+    quantity: 1,
+    price: vehicle.price,
+    totalPrice: vehicle.price,
+    paymentStatus: "Paid",
+    deliveryStatus: "Processing",
+});
 
     res.status(200).json({
       message: "Vehicle purchased successfully",
@@ -286,6 +289,25 @@ export const getPurchaseHistory = async (req, res) => {
     res.status(200).json(purchases);
   } catch (error) {
     res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+
+export const getAllPurchaseHistory = async (req, res) => {
+  console.log("Route hit");
+
+  try {
+    const purchases = await Purchase.find();
+
+    console.log(purchases);
+
+    return res.status(200).json(purchases);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
       message: error.message,
     });
   }

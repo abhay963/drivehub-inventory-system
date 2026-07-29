@@ -104,3 +104,9 @@ export const getPurchaseHistory = async () => {
   const response = await api.get("/vehicles/purchases");
   return response.data;
 };
+
+
+export const getAllPurchaseHistory = async () => {
+  const response = await api.get("/vehicles/all-purchases");
+  return response.data;
+};

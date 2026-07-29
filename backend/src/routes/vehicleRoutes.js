@@ -12,7 +12,7 @@ import {
   searchVehicles,
   purchaseVehicle,
   deleteVehicle,
-  restockVehicle, getPurchaseHistory
+  restockVehicle, getPurchaseHistory, getAllPurchaseHistory
 } from "../controllers/vehicleController.js";
 
 const router = express.Router();
@@ -48,7 +48,7 @@ router.get("/search", searchVehicles);
 router.get("/summary", getInventorySummary);
 
 router.get("/", protect, getAllVehicles);
-
+router.get("/all-purchases", protect, admin, getAllPurchaseHistory);
 router.post(
   "/",
   protect,
