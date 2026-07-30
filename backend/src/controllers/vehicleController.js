@@ -160,6 +160,18 @@ export const searchVehicles = async (req, res) => {
 
 export const purchaseVehicle = async (req, res) => {
   try {
+      console.log("Body:", req.body);
+  console.log("Quantity:", req.body.quantity);
+    const { quantity } = req.body;
+
+    const purchaseQty = Number(quantity);
+
+    if (!Number.isInteger(purchaseQty) || purchaseQty <= 0) {
+      return res.status(400).json({
+        message: "Invalid quantity",
+      });
+    }
+
     const vehicle = await Vehicle.findById(req.params.id);
 
     if (!vehicle) {
@@ -168,31 +180,31 @@ export const purchaseVehicle = async (req, res) => {
       });
     }
 
-    if (vehicle.quantity <= 0) {
+    if (vehicle.quantity < purchaseQty) {
       return res.status(400).json({
-        message: "Vehicle out of stock",
+        message: "Insufficient stock",
       });
     }
 
-    vehicle.quantity -= 1;
-
+    vehicle.quantity -= purchaseQty;
     await vehicle.save();
 
     const purchase = await Purchase.create({
-    user: req.user.id,
-    vehicle: vehicle._id,
-    quantity: 1,
-    price: vehicle.price,
-    totalPrice: vehicle.price,
-    paymentStatus: "Paid",
-    deliveryStatus: "Processing",
-});
+      user: req.user.id,
+      vehicle: vehicle._id,
+      quantity: purchaseQty,
+      price: vehicle.price,
+      totalPrice: vehicle.price * purchaseQty,
+      paymentStatus: "Paid",
+      deliveryStatus: "Processing",
+    });
 
     res.status(200).json({
       message: "Vehicle purchased successfully",
       vehicle,
       purchase,
     });
+
   } catch (error) {
     res.status(500).json({
       message: error.message,
