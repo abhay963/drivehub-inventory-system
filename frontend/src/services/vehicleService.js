@@ -71,8 +71,11 @@ export const deleteVehicle = async (id) => {
 
 
 
-export const purchaseVehicle = async (id) => {
-  const response = await api.post(`/vehicles/${id}/purchase`);
+export const purchaseVehicle = async (id, quantity) => {
+  const response = await api.post(`/vehicles/${id}/purchase`, {
+    quantity,
+  });
+
   return response.data;
 };
 
