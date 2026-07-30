@@ -1,11 +1,21 @@
 import request from "supertest";
 import app from "../app.js";
+import User from "../models/User.js";
 
 import {
   connectTestDB,
   disconnectTestDB,
   clearDatabase,
 } from "./setup.js";
+
+import {
+  describe,
+  test,
+  expect,
+  beforeAll,
+  afterAll,
+  afterEach,
+} from "@jest/globals";
 
 beforeAll(async () => {
   await connectTestDB();
@@ -21,97 +31,121 @@ afterAll(async () => {
 
 describe("Auth API", () => {
   test("POST /api/auth/register should register a user", async () => {
-    const response = await request(app).post("/api/auth/register").send({
-      name: "Abhay",
-      email: "abhay@test.com",
-      password: "123456",
-    });
+    const response = await request(app)
+      .post("/api/auth/register")
+      .send({
+        name: "Abhay",
+        email: "abhay@test.com",
+        phone: "9876543210",
+        password: "123456",
+      });
 
     expect(response.statusCode).toBe(201);
-  });
-});
-
-
-test("should not register user with existing email", async () => {
-  const user = {
-    name: "Abhay",
-    email: "abhay@test.com",
-    password: "123456",
-  };
-
-  await request(app).post("/api/auth/register").send(user);
-
-  const response = await request(app)
-    .post("/api/auth/register")
-    .send(user);
-
-  expect(response.statusCode).toBe(400);
-  expect(response.body.message).toBe("User already exists");
-});
-
-
-
-import User from "../models/User.js";
-
-test("password should be hashed before saving", async () => {
-  await request(app).post("/api/auth/register").send({
-    name: "Abhay",
-    email: "hash@test.com",
-    password: "123456",
+    expect(response.body.message).toBe(
+      "User Registered Successfully"
+    );
+    expect(response.body.user).toHaveProperty("_id");
+    expect(response.body.user.email).toBe("abhay@test.com");
+    expect(response.body.user.phone).toBe("9876543210");
   });
 
-  const user = await User.findOne({
-    email: "hash@test.com",
+  test("should not register user with existing email", async () => {
+    const user = {
+      name: "Abhay",
+      email: "abhay@test.com",
+      phone: "9876543210",
+      password: "123456",
+    };
+
+    await request(app)
+      .post("/api/auth/register")
+      .send(user);
+
+    const response = await request(app)
+      .post("/api/auth/register")
+      .send(user);
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.message).toBe("User already exists");
   });
 
-  expect(user.password).not.toBe("123456");
-});
+  test("password should be hashed before saving", async () => {
+    await request(app)
+      .post("/api/auth/register")
+      .send({
+        name: "Abhay",
+        email: "hash@test.com",
+        phone: "9876543210",
+        password: "123456",
+      });
 
+    const user = await User.findOne({
+      email: "hash@test.com",
+    });
 
-
-
-test("should login user with valid credentials", async () => {
-  await request(app).post("/api/auth/register").send({
-    name: "Abhay",
-    email: "abhay@test.com",
-    password: "123456",
+    expect(user).not.toBeNull();
+    expect(user.password).not.toBe("123456");
   });
 
-  const response = await request(app).post("/api/auth/login").send({
-    email: "abhay@test.com",
-    password: "123456",
+  test("should login user with valid credentials", async () => {
+    await request(app)
+      .post("/api/auth/register")
+      .send({
+        name: "Abhay",
+        email: "abhay@test.com",
+        phone: "9876543210",
+        password: "123456",
+      });
+
+    const response = await request(app)
+      .post("/api/auth/login")
+      .send({
+        email: "abhay@test.com",
+        password: "123456",
+      });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBe("Login Successful");
+    expect(response.body).toHaveProperty("token");
+    expect(response.body.user.email).toBe("abhay@test.com");
+    expect(response.body.user.phone).toBe("9876543210");
   });
 
-  expect(response.statusCode).toBe(200);
-  expect(response.body).toHaveProperty("token");
-});
+  test("should not login with wrong password", async () => {
+    await request(app)
+      .post("/api/auth/register")
+      .send({
+        name: "Abhay",
+        email: "wrong@test.com",
+        phone: "9876543210",
+        password: "123456",
+      });
 
+    const response = await request(app)
+      .post("/api/auth/login")
+      .send({
+        email: "wrong@test.com",
+        password: "abcdef",
+      });
 
-
-
-test("should not login with wrong password", async () => {
-  await request(app).post("/api/auth/register").send({
-    name: "Abhay",
-    email: "wrong@test.com",
-    password: "123456",
+    expect(response.statusCode).toBe(400);
+    expect(response.body.message).toBe(
+      "Invalid Credentials"
+    );
   });
 
-  const response = await request(app).post("/api/auth/login").send({
-    email: "wrong@test.com",
-    password: "abcdef",
+  test("should not login if user does not exist", async () => {
+    const response = await request(app)
+      .post("/api/auth/login")
+      .send({
+        email: "nouser@test.com",
+        password: "123456",
+      });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.message).toBe(
+      "Invalid Credentials"
+    );
   });
-
-  expect(response.statusCode).toBe(400);
-});
-
-
-
-
-test("should not login if user does not exist", async () => {
-  const response = await request(app).post("/api/auth/login").send({
-    email: "nouser@test.com",
-    password: "123456",
-  });
-
-  expect(response.statusCode).toBe(400);
 });

@@ -9,8 +9,12 @@ import { sendOtpEmail } from "../utils/sendEmail.js";
 //REGISTER
 export const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-
+    const { name, email,phone, password,} = req.body;
+if (!name || !email || !phone || !password) {
+  return res.status(400).json({
+    message: "All fields are required",
+  });
+}
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -24,6 +28,7 @@ export const register = async (req, res) => {
 const user = await User.create({
   name,
   email: email.toLowerCase(),
+  phone,
   password: hashedPassword,
 });
 

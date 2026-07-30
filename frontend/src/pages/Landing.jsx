@@ -395,7 +395,7 @@ const Landing = () => {
       </header>
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section className="relative px-6 sm:px-10 pt-20 sm:pt-32 pb-24 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+      <section className="relative px-6 sm:px-10 pt-10 sm:pt-10 pb-24 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-10 lg:gap-16 items-center ">
         <motion.div
           initial="hidden"
           animate="visible"
