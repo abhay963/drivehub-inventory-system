@@ -451,21 +451,21 @@ The backend exposes a RESTful API for authentication, vehicle management, invent
 
 # 📸 Application Screenshots
 
-The following screenshots showcase the major features and functionality of the DriveHub application.
+The following screenshots showcase the major features and functionality of the **DriveHub – Car Dealership Inventory System**.
 
 ---
 
 ## 🏠 Landing Page
 
-The landing page introduces DriveHub with a modern and responsive interface.
+Modern and responsive landing page introducing the DriveHub platform.
 
 ![Landing Page](./screenshots/app/01-Landing.png)
 
 ---
 
-## 🚀 Landing Page (Features)
+## ✨ Landing Page Features
 
-Highlights the key features and services offered by the platform.
+Highlights the key features and services offered by the application.
 
 ![Landing Page Features](./screenshots/app/02-Landing.png)
 
@@ -473,15 +473,15 @@ Highlights the key features and services offered by the platform.
 
 ## 📝 User Registration
 
-New users can create an account securely.
+Secure user registration page.
 
 ![User Registration](./screenshots/app/03-Register.png)
 
 ---
 
-## ✅ Registration Validation
+## ✅ Registration Form Validation
 
-Form validation and error handling during registration.
+Client-side validation and error handling during registration.
 
 ![Registration Validation](./screenshots/app/04-Register.png)
 
@@ -489,7 +489,7 @@ Form validation and error handling during registration.
 
 ## 📧 Email OTP Verification
 
-OTP verification to activate newly registered accounts.
+OTP verification screen for activating newly created accounts.
 
 ![OTP Verification](./screenshots/app/05-VerifyEmail.png)
 
@@ -497,89 +497,93 @@ OTP verification to activate newly registered accounts.
 
 ## 🔐 User Login
 
-Secure authentication using JWT.
+JWT-based secure login page.
 
 ![Login](./screenshots/app/06-Signin.png)
 
 ---
 
-## 👨‍💼 Admin Dashboard
+# 👨‍💼 Admin Panel
 
-Overview of inventory, sales, and management features.
+## 📊 Admin Dashboard
+
+Overview of dealership statistics and management features.
 
 ![Admin Dashboard](./screenshots/app/07-Admin-Dashboard.png)
 
 ---
 
-## 📊 Dashboard Analytics
+## 📈 Dashboard Analytics
 
-Visual charts displaying dealership statistics.
+Charts displaying sales, inventory, and dealership insights.
 
-![Dashboard Analytics](./screenshots/app/08-Admin-Dashboard-Chart.png)
+![Dashboard Charts](./screenshots/app/08-Admin-Dashboard-Charts.png)
 
 ---
 
-## 📈 Sales Analytics
+## 📉 Additional Dashboard Analytics
 
-Additional charts showing inventory and sales insights.
+Additional statistical visualizations and reports.
 
-![Sales Analytics](./screenshots/app/09-Admin-Dashboard-Chart.png)
+![Dashboard Charts 2](./screenshots/app/09-Admin-Dashboard-Chart2.png)
 
 ---
 
 ## 🚗 Vehicle Inventory Management
 
-Admin interface for managing dealership inventory.
+Manage all vehicles available in inventory.
 
-![Inventory Management](./screenshots/app/10-Admin-Inventory.png)
+![Inventory](./screenshots/app/10-Admin-Inventory.png)
 
 ---
 
 ## ➕ Add New Vehicle
 
-Form for adding vehicles to the inventory.
+Admin interface for adding new vehicles.
 
 ![Add Vehicle](./screenshots/app/11-Admin-Add-Vehicle.png)
 
 ---
 
-## 📦 Restock Vehicle Inventory
+## 📦 Update Vehicle Stock
 
-Increase available stock for existing vehicles.
+Increase stock quantity of existing vehicles.
 
-![Restock Vehicle](./screenshots/app/12-Admin-Update-Stock.png)
+![Update Stock](./screenshots/app/12-Admin-Update-Stock.png)
 
 ---
 
-## 💰 Sales Management
+## 💰 Sales Dashboard
 
-View completed vehicle purchases and sales records.
+Monitor completed vehicle purchases.
 
-![Sales Management](./screenshots/app/13-Admin-Sales.png)
+![Sales Dashboard](./screenshots/app/13-Admin-Sales.png)
 
 ---
 
 ## 📋 Sales Details
 
-Detailed sales and purchase information.
+Detailed sales history and purchase information.
 
 ![Sales Details](./screenshots/app/14-Admin-Sales-2.png)
 
 ---
 
-## 👤 User Dashboard
+# 👤 User Panel
 
-Customer dashboard displaying available vehicles.
+## 🏡 User Dashboard
+
+Customer dashboard after login.
 
 ![User Dashboard](./screenshots/app/15-User-Dashboard.png)
 
 ---
 
-## 🚘 Vehicle Listing
+## 🚘 Vehicle Recommendations
 
-Browse and explore available vehicles.
+Browse featured and available vehicles.
 
-![Vehicle Listing](./screenshots/app/16-User-Dashboard2.png)
+![User Dashboard 2](./screenshots/app/16-User-Dashboard2.png)
 
 ---
 
@@ -591,25 +595,25 @@ Manage personal account information.
 
 ---
 
-## 🤖 Chat Assistant
+## 💬 Chat Assistant
 
-Integrated chat interface.
+Built-in chatbot interface.
 
-![Chat Assistant](./screenshots/app/18-User-ChatBot.png)
-
----
-
-## 🧠 AI Vehicle Assistant
-
-Groq-powered AI assistant for answering vehicle-related queries.
-
-![AI Assistant](./screenshots/app/19-User-AiChatBot.png)
+![ChatBot](./screenshots/app/18-User-ChatBot.png)
 
 ---
 
-## 🚗 Vehicle Inventory
+## 🤖 AI Vehicle Assistant
 
-Browse all available vehicles.
+Groq-powered AI assistant for vehicle-related queries.
+
+![AI ChatBot](./screenshots/app/19-User-AiChatBot.png)
+
+---
+
+## 🚙 Vehicle Inventory
+
+Browse the complete dealership inventory.
 
 ![Vehicle Inventory](./screenshots/app/20-User-Inventory.png)
 
@@ -617,7 +621,7 @@ Browse all available vehicles.
 
 ## 🛒 Purchase Vehicle
 
-Purchase workflow with stock validation.
+Vehicle purchase page with stock validation.
 
 ![Purchase Vehicle](./screenshots/app/21-User-Purchase.png)
 
@@ -625,31 +629,31 @@ Purchase workflow with stock validation.
 
 ## 💳 Checkout
 
-Vehicle checkout process.
+Checkout process before confirming the purchase.
 
 ![Checkout](./screenshots/app/22-User-Checkout.png)
 
 ---
 
-## ✅ Payment Status
+## 💵 Payment
 
-Confirmation after successful purchase.
+Payment processing screen.
 
-![Payment Status](./screenshots/app/23-User-Payment.png)
+![Payment](./screenshots/app/23-User-Payment.png)
 
 ---
 
-## 🎉 Purchase Success
+## ✅ Payment Status
 
-Purchase completion screen.
+Successful payment confirmation screen.
 
-![Purchase Success](./screenshots/app/24-User-Payment-Status.png)
+![Payment Status](./screenshots/app/24-User-Payment-Status.png)
 
 ---
 
 ## 📜 Purchase History
 
-Users can view all previously purchased vehicles.
+View all previously purchased vehicles.
 
 ![Purchase History](./screenshots/app/25-User-Purchase-History.png)
 
@@ -657,7 +661,7 @@ Users can view all previously purchased vehicles.
 
 ## 📄 Purchase Details
 
-Detailed information for each purchase.
+Detailed information for a selected purchase.
 
 ![Purchase Details](./screenshots/app/26-User-Purchase-Details.png)
 
@@ -665,103 +669,39 @@ Detailed information for each purchase.
 
 ## ❌ Out of Stock
 
-Purchase button is automatically disabled when inventory reaches zero.
+Vehicle automatically becomes unavailable when inventory reaches zero.
 
 ![Out of Stock](./screenshots/app/27-User-Vehicle-Out-Of-Stock.png)
 
-# 🧪 Test Report
-
-The backend of DriveHub follows a testing approach using **Jest** and **Supertest** to verify the correctness of API endpoints, authentication flow, authorization, and inventory management.
-
-## Testing Tools
-
-- Jest
-- Supertest
-- MongoDB Memory Server
-
----
-
-## Test Coverage
-
-The following modules were tested:
-
-### Authentication
-
-- ✅ User Registration
-- ✅ OTP Verification
-- ✅ User Login
-- ✅ Duplicate User Validation
-- ✅ Invalid Login Credentials
-
-### Vehicle Management
-
-- ✅ Add Vehicle
-- ✅ Get All Vehicles
-- ✅ Search Vehicles
-- ✅ Update Vehicle
-- ✅ Delete Vehicle
-
-### Inventory Management
-
-- ✅ Purchase Vehicle
-- ✅ Prevent Purchase When Quantity is Zero
-- ✅ Restock Vehicle
-
-### Authorization
-
-- ✅ JWT Authentication
-- ✅ Protected Routes
-- ✅ Admin-only Endpoints
-
----
-
-## Test Results
-
-All implemented backend tests passed successfully.
-
-Example output:
-
-```text
-PASS tests/auth.test.js
-PASS tests/vehicle.test.js
-PASS tests/purchase.test.js
-
-Test Suites: 3 passed, 3 total
-Tests:       XX passed, XX total
-Snapshots:   0 total
-Time:        X.XXX s
-```
-
-> Replace the values above with the actual output from your test run.
-
 ---
 
 # 🧪 Test Report
 
-DriveHub was developed following a **Test-Driven Development (TDD)** approach. Backend functionality was validated using automated tests before and during implementation to ensure correctness, reliability, and maintainability.
+DriveHub was developed using a **Test-Driven Development (TDD)** approach to ensure the correctness, reliability, and maintainability of the backend APIs. Automated tests were written and executed throughout development to validate business logic and API behavior.
 
 ---
 
-## 🛠️ Testing Tools
+## 🛠️ Testing Stack
 
-- Jest
-- Supertest
-- MongoDB Memory Server
+- **Jest** – JavaScript testing framework
+- **Supertest** – API endpoint testing
+- **MongoDB Memory Server** – Isolated in-memory database for testing
 
 ---
 
 ## ✅ Test Coverage
 
-The automated test suite covers the following functionality:
+The automated test suite validates the following modules:
 
-### Authentication
+### 🔐 Authentication
 
 - User Registration
+- Email OTP Verification
 - User Login
 - JWT Authentication
-- Authorization Middleware
+- Protected Routes
 
-### Vehicle Management
+### 🚗 Vehicle Management
 
 - Create Vehicle
 - Retrieve Vehicles
@@ -769,139 +709,197 @@ The automated test suite covers the following functionality:
 - Update Vehicle
 - Delete Vehicle
 
-### Inventory Management
+### 📦 Inventory Management
 
 - Purchase Vehicle
 - Restock Vehicle
-- Inventory Quantity Updates
+- Inventory Updates
 - Out-of-Stock Validation
 
 ---
 
-## 🔄 TDD Workflow
+# 🔄 TDD Workflow
 
 The project followed the **Red → Green → Refactor** development cycle.
 
-### 🔴 Red Phase
+## 🔴 Red Phase
 
-Tests were written first and intentionally failed before implementation.
+Tests were written before implementation to define the expected behavior. Initially, the tests failed because the required functionality had not yet been implemented.
 
-| Authentication Tests | Vehicle Tests |
-|----------------------|---------------|
+| Authentication Test | Vehicle Test |
+|---------------------|--------------|
 | ![](./screenshots/tests/tdd-progress/01-auth-test-initial-failure.png) | ![](./screenshots/tests/tdd-progress/03-vehicle-test-initial-failure.png) |
 
-Additional failing test scenarios:
+---
 
-- Delete Vehicle Validation
-- Purchase Workflow Validation
-- Summary Endpoint Validation
+## 🟢 Green Phase
+
+After implementing the required functionality, all test cases passed successfully.
+
+![](./screenshots/tests/tdd-progress/04-auth-and-vehicle-tests-passing.png)
 
 ---
 
-### 🟢 Green Phase
+# 📬 API Testing
 
-After implementing the required functionality, all tests passed successfully.
+The REST APIs were manually verified using **Postman** in addition to the automated Jest test suite.
 
-| Passing Test Suite |
-|--------------------|
-| ![](./screenshots/tests/tdd-progress/04-auth-and-vehicle-tests-passing.png) |
+| Register API | Login API |
+|--------------|-----------|
+| ![](./screenshots/tests/postman/01-register-user-api.png.png) | ![](./screenshots/tests/postman/02-login-user-api.png.png) |
 
----
+| Vehicle Creation | Vehicle Search |
+|------------------|----------------|
+| ![](./screenshots/tests/postman/05-create-vehicle-api.png.png) | ![](./screenshots/tests/postman/06-search-vehicles-api.png.png) |
 
-## 📬 API Testing
-
-The REST API was also verified using Postman.
-
-| API | Screenshot |
-|-----|------------|
-| Register User | ![](./screenshots/tests/postman/01-register-user-api.png.png) |
-| Login User | ![](./screenshots/tests/postman/02-login-user-api.png.png) |
-| Send OTP | ![](./screenshots/tests/postman/03-send-otp-api.png.png) |
-| Verify OTP | ![](./screenshots/tests/postman/04-verify-otp-api.png.png) |
-| Create Vehicle | ![](./screenshots/tests/postman/05-create-vehicle-api.png.png) |
-| Search Vehicles | ![](./screenshots/tests/postman/06-search-vehicles-api.png.png) |
-| Update Vehicle | ![](./screenshots/tests/postman/07-update-vehicle-api.png.png) |
-| Delete Vehicle | ![](./screenshots/tests/postman/08-delete-vehicle-api.png.png) |
+These API tests verify authentication, vehicle management, and core inventory operations.
 
 ---
 
-## 📊 Final Test Report
+# 📊 Final Test Results
 
-All automated backend tests executed successfully.
+All backend test suites executed successfully.
 
-![Jest Test Suite](./screenshots/tests/unit-tests/01-jest-test-suite-passed.png)
+```text
+Test Suites: 3 passed, 3 total
+Tests:       28 passed, 28 total
+Snapshots:   0 total
+Time:        9.119 s
+```
+
+### Jest Test Summary
+
+![](./screenshots/tests/unit-tests/01-jest-test-suite-passed.png)
+
+---
+
+## ✅ Testing Summary
+
+| Category | Status |
+|----------|--------|
+| Authentication | ✅ Passed |
+| Vehicle Management | ✅ Passed |
+| Inventory Management | ✅ Passed |
+| Purchase Workflow | ✅ Passed |
+| Protected Routes | ✅ Passed |
+| API Testing (Postman) | ✅ Passed |
+| Automated Tests (Jest) | ✅ Passed |
+
+This testing process helped ensure that the application's core functionality behaves correctly and remains reliable as new features are added.
 
 
 # 🤖 My AI Usage
 
-The development of **DriveHub** was assisted by AI tools as part of a modern software development workflow. AI was used responsibly to accelerate development, improve code quality, and assist with debugging while ensuring that all generated code was reviewed, modified, tested, and integrated manually.
+AI tools were used throughout the development of **DriveHub** as learning and productivity assistants. They helped me explore implementation approaches, debug issues, improve the user interface, and review my code. All suggestions were carefully reviewed before being incorporated into the project, and the final implementation, testing, and deployment were completed by me.
 
 ---
 
-## AI Tools Used
+## 🛠️ AI Tools Used
 
-- ChatGPT (OpenAI)
-- Groq API (Application Feature)
+- **ChatGPT** – Backend development guidance, debugging, testing ideas, documentation, and code reviews.
+- **Gemini** – UI/UX suggestions, responsive layouts, and frontend improvements.
+- **Grok** – Tailwind CSS styling ideas and interface refinements.
+- **Groq API** – Integrated into the application as the AI-powered vehicle assistant for end users.
 
 ---
 
-## How I Used AI
+## 💡 How I Used AI
 
 ### Backend Development
 
-- Generated initial Express.js controller and route boilerplate.
-- Discussed REST API design and project architecture.
-- Assisted in designing MongoDB schemas and model relationships.
-- Helped debug authentication, authorization, and middleware issues.
-- Suggested improvements for validation and error handling.
+During backend development, I used AI mainly to discuss implementation approaches and review my design decisions.
+
+Examples include:
+
+- Reviewing REST API design.
+- Understanding JWT authentication and authorization.
+- Discussing MongoDB schema design.
+- Reviewing controller and route organization.
+- Finding and fixing bugs during development.
+- Improving validation and error handling.
+
+The final APIs, business logic, database integration, and application structure were implemented and tested by me.
+
+---
 
 ### Frontend Development
 
-- Assisted with React component structure.
-- Suggested responsive Tailwind CSS layouts.
-- Improved user interface and user experience.
-- Helped organize routing and protected pages.
+For the frontend, AI was mainly used as a UI brainstorming partner.
+
+It helped with:
+
+- Responsive layout suggestions.
+- Tailwind CSS improvements.
+- Dashboard layout ideas.
+- Component organization.
+- User experience improvements.
+- Minor styling refinements.
+
+I customized the final interface and integrated all frontend components manually.
+
+---
 
 ### Testing
 
-- Assisted in writing Jest and Supertest test cases.
-- Helped identify missing edge cases.
-- Suggested improvements for API testing.
+AI helped me think about different testing scenarios and possible edge cases.
+
+Examples include:
+
+- Suggesting Jest test cases.
+- Discussing API testing strategies.
+- Reviewing authentication edge cases.
+- Identifying validation scenarios worth testing.
+
+The final test suite was written, executed, debugged, and verified manually.
+
+---
 
 ### Documentation
 
-- Assisted in writing the project documentation.
-- Helped organize the README structure.
-- Assisted in creating this AI Usage section.
-- Helped prepare the `PROMPTS.md` file containing AI interaction history.
+AI also assisted with improving the project documentation by suggesting a better structure and clearer explanations.
 
-### Debugging & Refactoring
+This included:
 
-- Helped identify bugs during development.
-- Suggested cleaner and more maintainable code.
-- Recommended code refactoring while preserving functionality.
+- Organizing the README.
+- Improving setup instructions.
+- Writing API documentation.
+- Preparing the AI usage documentation.
+- Creating the `PROMPTS.md` file.
 
----
-
-## Reflection
-
-Using AI significantly improved my development workflow by reducing time spent on repetitive tasks, assisting with debugging, generating initial code structures, and improving documentation quality.
-
-Rather than copying generated code directly, I reviewed, tested, modified, and integrated AI suggestions into the project to ensure correctness, maintainability, and compliance with the assignment requirements.
-
-AI served as a development assistant, while all implementation decisions, testing, debugging, integration, and final code review were completed by me.
+All documentation was reviewed and edited before submission.
 
 ---
 
-## AI Commit Co-authorship
+### Debugging & Code Review
 
-Where AI contributed to development, commit messages include AI attribution in accordance with the assignment requirements. Additionally, all prompts used during development are documented in the `PROMPTS.md` file located in the root of this repository.
+Whenever I encountered errors during development, I used AI as a debugging assistant rather than expecting complete solutions.
 
+Typical uses included:
 
+- Understanding error messages.
+- Finding possible causes of bugs.
+- Reviewing API responses.
+- Checking React state management issues.
+- Reviewing deployment-related problems.
+- Suggesting cleaner and more maintainable code.
 
-# 🚀 Future Improvements
+I verified every suggested solution before applying it to the project.
 
-Although DriveHub satisfies the requirements of the TDD Kata assignment, several enhancements could further improve the application.
+---
+
+# 📝 Reflection
+
+Using AI made the development process more efficient, especially when learning new concepts, debugging issues, reviewing code, and improving documentation.
+
+Instead of relying on AI to build the project, I primarily used it as a second opinion whenever I was unsure about an implementation or wanted to compare different approaches.
+
+Every feature in this project—including authentication, inventory management, purchasing, testing, deployment, and frontend integration—was implemented, integrated, tested, and verified by me. AI served as a learning resource and development assistant throughout the project rather than replacing the software development process.
+
+---
+
+## 📌 AI Usage Transparency
+
+To maintain transparency, this repository also includes a **PROMPTS.md** file documenting the major prompts used during development. AI assistance was limited to guidance, code reviews, debugging support, UI suggestions, testing ideas, and documentation improvements, while the final implementation and project decisions remain my own.
 
 ## Planned Features
 
