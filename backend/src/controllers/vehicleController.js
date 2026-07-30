@@ -311,7 +311,10 @@ export const getAllPurchaseHistory = async (req, res) => {
   console.log("Route hit");
 
   try {
-    const purchases = await Purchase.find();
+const purchases = await Purchase.find()
+  .populate("user", "name email")
+  .populate("vehicle", "brand model year image")
+  .sort({ createdAt: -1 });
 
     console.log(purchases);
 

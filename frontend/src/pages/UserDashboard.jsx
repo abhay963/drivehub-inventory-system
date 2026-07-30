@@ -75,7 +75,7 @@ const [summary, setSummary] = useState({
   const [transactionId, setTransactionId] = useState("");
   const [purchaseDate, setPurchaseDate] = useState("");
   const [isPurchasing, setIsPurchasing] = useState(false);
-
+const [purchaseQuantity, setPurchaseQuantity] = useState(1);
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const userName = user?.name || user?.username || "Customer";
 
@@ -194,7 +194,10 @@ const [summary, setSummary] = useState({
       setIsPurchasing(true);
       try {
         if (typeof purchaseVehicle === "function") {
-          await purchaseVehicle(selectedVehicle._id || selectedVehicle.id);
+       await purchaseVehicle(
+  selectedVehicle._id || selectedVehicle.id,
+  purchaseQuantity
+);
         } else {
           // Fallback: if the service function name is different,
           // replace the call above with your actual API.

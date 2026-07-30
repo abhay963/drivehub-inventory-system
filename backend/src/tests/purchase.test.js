@@ -224,3 +224,99 @@ describe("Purchase History API", () => {
     expect(response.body).toEqual([]);
   });
 });
+
+
+
+
+describe("Admin Purchase History API", () => {
+  let admin;
+  let adminToken;
+
+  beforeAll(async () => {
+    admin = await User.create({
+      name: "Admin",
+      email: "admin@test.com",
+      phone: "9999999999",
+      password: "hashedpassword",
+      role: "admin",
+    });
+
+    adminToken = jwt.sign(
+      {
+        id: admin._id,
+        role: "admin",
+      },
+      process.env.JWT_SECRET
+    );
+  });
+
+  test("should return all purchases with populated user and vehicle", async () => {
+    await request(app)
+      .post(`/api/vehicles/${vehicle._id}/purchase`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        quantity: 2,
+      });
+
+    const response = await request(app)
+      .get("/api/vehicles/all-purchases")
+      .set("Authorization", `Bearer ${adminToken}`);
+
+    expect(response.statusCode).toBe(200);
+
+    expect(response.body).toHaveLength(1);
+
+    expect(response.body[0].user.name).toBe("Abhay");
+
+    expect(response.body[0].user.email).toBe("abhay@test.com");
+
+    expect(response.body[0].vehicle.brand).toBe("Toyota");
+
+    expect(response.body[0].vehicle.model).toBe("Fortuner");
+
+    expect(response.body[0].quantity).toBe(2);
+
+    expect(response.body[0].totalPrice).toBe(90000);
+  });
+
+  test("should deny normal user access", async () => {
+    const response = await request(app)
+      .get("/api/vehicles/all-purchases")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(response.statusCode).toBe(403);
+  });
+
+  test("should require authentication", async () => {
+    const response = await request(app).get(
+      "/api/vehicles/all-purchases"
+    );
+
+    expect(response.statusCode).toBe(401);
+  });
+
+  test("should return latest purchases first", async () => {
+  await request(app)
+    .post(`/api/vehicles/${vehicle._id}/purchase`)
+    .set("Authorization", `Bearer ${token}`)
+    .send({ quantity: 1 });
+
+  await new Promise((r) => setTimeout(r, 10));
+
+  await request(app)
+    .post(`/api/vehicles/${vehicle._id}/purchase`)
+    .set("Authorization", `Bearer ${token}`)
+    .send({ quantity: 2 });
+
+  const response = await request(app)
+    .get("/api/vehicles/all-purchases")
+    .set("Authorization", `Bearer ${adminToken}`);
+
+  expect(response.statusCode).toBe(200);
+  expect(response.body).toHaveLength(2);
+
+  expect(response.body[0].quantity).toBe(2);
+  expect(response.body[1].quantity).toBe(1);
+});
+});
+

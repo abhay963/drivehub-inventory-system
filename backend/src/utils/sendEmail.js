@@ -21,152 +21,226 @@ export const sendOtpEmail = async (email, otp) => {
       subject: "Verify Your Email",
       text: `Your verification code is ${otp}. It is valid for 5 minutes.`,
 
-      html: `
+     html: `
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Email Verification</title>
-
-<style>
-@keyframes fadeIn{
-from{opacity:0;transform:translateY(18px);}
-to{opacity:1;transform:translateY(0);}
-}
-@keyframes glow{
-0%,100%{
-box-shadow:0 0 0 0 rgba(79,70,229,.45),
-0 8px 25px rgba(79,70,229,.25);
-}
-50%{
-box-shadow:0 0 0 10px rgba(79,70,229,0),
-0 12px 35px rgba(79,70,229,.35);
-}
-}
-@keyframes pulse{
-0%,100%{transform:scale(1);}
-50%{transform:scale(1.03);}
-}
-</style>
-
 </head>
 
-<body style="margin:0;padding:0;background:#f0f4ff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+<body style="margin:0;padding:0;background:#f4f7fb;font-family:Arial,Helvetica,sans-serif;color:#1f2937;">
 
-<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">
-Your verification code is ${otp}. Valid for 5 minutes.
-</div>
-
-<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f0f4ff;padding:40px 16px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f7fb;padding:40px 15px;">
 <tr>
 <td align="center">
 
-<table width="100%" style="max-width:560px;background:#ffffff;border-radius:24px;overflow:hidden;box-shadow:0 20px 50px rgba(79,70,229,.12);">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+style="max-width:620px;background:#ffffff;border-radius:18px;overflow:hidden;border:1px solid #e5e7eb;">
 
+<!-- Header -->
 <tr>
-<td style="background:linear-gradient(135deg,#4f46e5,#7c3aed,#2563eb);padding:42px 32px;text-align:center;">
+<td style="background:#111827;padding:40px;text-align:center;">
 
 <div style="
 width:72px;
 height:72px;
-background:rgba(255,255,255,.18);
-border:2px solid rgba(255,255,255,.35);
-border-radius:20px;
-margin:0 auto 18px;
-display:flex;
+background:#ffffff;
+border-radius:18px;
+display:inline-flex;
 align-items:center;
 justify-content:center;
-font-size:36px;
+font-size:34px;
+margin-bottom:18px;
 ">
-🚗
+🚘
 </div>
 
-<h1 style="margin:0;font-size:26px;color:#fff;">
+<h1 style="
+margin:0;
+color:#ffffff;
+font-size:30px;
+font-weight:700;
+">
 Car Dealership Inventory
 </h1>
 
-<p style="margin-top:8px;color:rgba(255,255,255,.9);">
-Email Verification
+<p style="
+margin:12px 0 0;
+color:#d1d5db;
+font-size:16px;
+">
+Secure Email Verification
 </p>
 
 </td>
 </tr>
 
+<!-- Body -->
 <tr>
-<td style="padding:42px 36px;text-align:center;">
+<td style="padding:45px 40px;">
 
-<h2 style="margin:0;color:#111827;">
-Verify your email address
-</h2>
-
-<p style="margin:18px 0 32px;color:#6b7280;line-height:1.7;">
-Welcome aboard! Use the one-time code below to complete your registration.
-<br>
-This code is valid for
-<strong style="color:#4f46e5;">5 minutes</strong>.
+<p style="
+margin:0;
+font-size:16px;
+color:#374151;
+line-height:28px;
+">
+Hello,
 </p>
+
+<p style="
+margin:18px 0 32px;
+font-size:16px;
+color:#4b5563;
+line-height:28px;
+">
+Thanks for registering with
+<strong>Car Dealership Inventory System</strong>.
+
+To verify your email address, enter the verification code shown below.
+</p>
+
+<!-- OTP Box -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td align="center">
 
 <div style="
 display:inline-block;
-background:linear-gradient(135deg,#4f46e5,#2563eb);
-color:#fff;
-padding:20px 48px;
-border-radius:18px;
-font-size:38px;
+background:#f9fafb;
+border:2px dashed #2563eb;
+border-radius:16px;
+padding:22px 40px;
+">
+
+<div style="
+font-size:13px;
+color:#6b7280;
+letter-spacing:2px;
+margin-bottom:12px;
+text-transform:uppercase;
+font-weight:bold;
+">
+Verification Code
+</div>
+
+<div style="
+font-size:42px;
 font-weight:800;
 letter-spacing:12px;
-font-family:Consolas,Monaco,monospace;
+font-family:Consolas,monospace;
+color:#2563eb;
 ">
 ${otp}
 </div>
 
-<div style="
-margin-top:36px;
-background:#f0f4ff;
-border:1px solid #e0e7ff;
-border-radius:16px;
-padding:18px;
-text-align:left;
-">
-
-<p style="margin:0;color:#374151;line-height:1.7;">
-🔒 <strong>Security Tip:</strong><br>
-Never share this verification code with anyone.
-If you didn't request this email, you can safely ignore it.
-</p>
-
 </div>
 
 </td>
 </tr>
+</table>
 
-<tr>
-<td style="
-background:#f8fafc;
-padding:28px;
-text-align:center;
-border-top:1px solid #e5e7eb;
+<!-- Expiry -->
+<div style="
+margin-top:34px;
+background:#eff6ff;
+border-left:5px solid #2563eb;
+padding:18px 20px;
+border-radius:10px;
 ">
 
-<p style="margin:0;color:#6b7280;">
-Need help? Contact our support team anytime.
+<p style="
+margin:0;
+font-size:15px;
+color:#1e3a8a;
+line-height:24px;
+">
+⏳ This verification code will expire in
+<strong>5 minutes.</strong>
 </p>
 
-<p style="margin-top:10px;font-size:12px;color:#9ca3af;">
-© ${new Date().getFullYear()} Car Dealership Inventory System
-<br>
-Built with ❤️ for a secure experience.
+</div>
+
+<!-- Security -->
+<div style="
+margin-top:22px;
+background:#fff7ed;
+border-left:5px solid #f97316;
+padding:18px 20px;
+border-radius:10px;
+">
+
+<p style="
+margin:0;
+font-size:15px;
+line-height:24px;
+color:#7c2d12;
+">
+<strong>Security Reminder</strong><br><br>
+
+• Never share this code with anyone.<br>
+• Our team will never ask for your OTP.<br>
+• If you didn't request this email, you can safely ignore it.
+</p>
+
+</div>
+
+<p style="
+margin-top:34px;
+font-size:15px;
+line-height:28px;
+color:#4b5563;
+">
+If you experience any issues, simply contact our support team and we'll be happy to help.
+</p>
+
+<p style="
+margin-top:32px;
+font-size:16px;
+color:#111827;
+font-weight:bold;
+">
+Thank you,<br>
+Car Dealership Inventory Team
+</p>
+
+</td>
+</tr>
+
+<!-- Footer -->
+<tr>
+<td style="
+background:#f9fafb;
+border-top:1px solid #e5e7eb;
+padding:30px;
+text-align:center;
+">
+
+<p style="
+margin:0;
+font-size:13px;
+color:#6b7280;
+line-height:24px;
+">
+This is an automated email. Please do not reply.
+</p>
+
+<p style="
+margin-top:10px;
+font-size:12px;
+color:#9ca3af;
+line-height:22px;
+">
+© ${new Date().getFullYear()} Car Dealership Inventory System<br>
+All rights reserved.
 </p>
 
 </td>
 </tr>
 
 </table>
-
-<p style="margin-top:28px;font-size:12px;color:#94a3b8;">
-This is an automated message — please do not reply.
-</p>
 
 </td>
 </tr>
