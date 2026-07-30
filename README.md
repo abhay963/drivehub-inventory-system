@@ -226,6 +226,52 @@ This project implements all major requirements specified in the assignment.
                   • Groq AI
 ```
 
+
+# 🗄️ Entity Relationship (ER) Diagram
+
+The following ER diagram illustrates the database design of the DriveHub Car Dealership Inventory System, including the relationships between users, vehicles, purchases, categories, inventory logs, and OTP verification.
+
+<div align="center">
+
+<img src="./screenshots/er.png" alt="DriveHub ER Diagram" width="100%"/>
+
+</div>
+
+### Database Entities
+
+| Entity | Description |
+|---------|-------------|
+| **Users** | Stores user information, authentication details, and roles (Admin/User). |
+| **Vehicles** | Contains vehicle details such as brand, model, price, stock, images, and creator information. |
+| **Purchases** | Records vehicle purchases, payment information, quantity, and transaction history. |
+| **Categories** | Maintains vehicle categories for better organization and filtering. |
+| **Inventory_Logs** | Tracks inventory updates including purchases, restocking, and stock modifications. |
+| **OTPs** | Stores email verification OTPs with expiration details for secure account verification. |
+
+### Entity Relationships
+
+- A **User** can create multiple **Vehicles**.
+- A **User** can generate multiple **Inventory Logs**.
+- A **User** can request multiple **OTPs** for email verification.
+- A **Vehicle** belongs to one **Category**.
+- A **Vehicle** can have multiple **Inventory Logs**.
+- A **Vehicle** can appear in multiple **Purchase** records.
+- Each **Purchase** is associated with one **User** and one **Vehicle**.
+
+
+
+
+
+# 🔄 System Flow Diagram
+
+The following flow diagram illustrates the complete workflow of the DriveHub Car Dealership Inventory System, covering authentication, vehicle management, purchasing, payment processing, inventory updates, AI assistance, and supporting services.
+
+<div align="center">
+
+<img src="./screenshots/systemflow.png" alt="DriveHub System Flow Diagram" width="100%"/>
+
+</div>
+
 # 📂 Project Structure
 
 ```text
