@@ -4,6 +4,7 @@ import cors from "cors";
 
 import authRoutes from "./routes/authRoutes.js";
 import vehicleRoutes from "./routes/vehicleRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js";
 
 dotenv.config();
 
@@ -28,7 +29,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/vehicles", vehicleRoutes);
-
+app.use("/api/chat", chatRoutes);
 app.get("/", (req, res) => {
   res.json({
     message: "Car Dealership Inventory API is Running...",
