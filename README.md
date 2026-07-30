@@ -792,11 +792,11 @@ The REST APIs were manually verified using **Postman** in addition to the automa
 
 | Register API | Login API |
 |--------------|-----------|
-| ![](./screenshots/tests/postman/01-register-user-api.png.png) | ![](./screenshots/tests/postman/02-login-user-api.png.png) |
+| ![](./screenshots/tests/postman/01-register-user-api.png) | ![](./screenshots/tests/postman/02-login-user-api.png) |
 
 | Vehicle Creation | Vehicle Search |
 |------------------|----------------|
-| ![](./screenshots/tests/postman/05-create-vehicle-api.png.png) | ![](./screenshots/tests/postman/06-search-vehicles-api.png.png) |
+| ![](./screenshots/tests/postman/05-create-vehicle-api.png) | ![](./screenshots/tests/postman/06-search-vehicles-api.png) |
 
 These API tests verify authentication, vehicle management, and core inventory operations.
 
