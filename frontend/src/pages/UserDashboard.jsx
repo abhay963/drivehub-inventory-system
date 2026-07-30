@@ -1,6 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import AIChat from "../components/chat/AIChat";
+
 import {
   Car,
   Package,
@@ -281,6 +283,7 @@ const [summary, setSummary] = useState({
             variants={item}
             className="rounded-2xl border border-zinc-800/80 bg-zinc-900/60 p-6 relative overflow-hidden"
           >
+              <AIChat />
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-emerald-500 to-teal-500 opacity-60" />
             <div className="flex items-center justify-between">
               <div className="w-12 h-12 rounded-xl bg-emerald-600/15 border border-emerald-500/25 flex items-center justify-center text-emerald-400">
